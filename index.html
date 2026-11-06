@@ -1122,27 +1122,17 @@
     <!-- GLOBAL PRINT CONTAINER (Isolated for clean print execution) -->
     <div id="globalPrintArea" class="hidden"></div>
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD1olFD5dXFx4LGQdzXTklKTabTGu4Z9bg",
-  authDomain: "bienes---cpnp-ayacucho.firebaseapp.com",
-  projectId: "bienes---cpnp-ayacucho",
-  storageBucket: "bienes---cpnp-ayacucho.firebasestorage.app",
-  messagingSenderId: "534205552976",
-  appId: "1:534205552976:web:1f8d5e67f5c6f03fb87455",
-  measurementId: "G-FSJD5071MY"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+<script>
+  window.__firebase_config = JSON.stringify({
+    apiKey: "AIzaSyD1olFD5dXFx4LGQdzXTklKTabTGu4Z9bg",
+    authDomain: "bienes---cpnp-ayacucho.firebaseapp.com",
+    projectId: "bienes---cpnp-ayacucho",
+    storageBucket: "bienes---cpnp-ayacucho.firebasestorage.app",
+    messagingSenderId: "534205552976",
+    appId: "1:534205552976:web:1f8d5e67f5c6f03fb87455",
+    measurementId: "G-FSJD5071MY"
+  });
+</script>
     
     <!-- Firebase Cloud SDK Modules -->
     <script type="module">
