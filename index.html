@@ -1,0 +1,2735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control y Gestión de Bienes PNP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        olive: {
+                            50: '#f4f6f1',
+                            100: '#e4eadb',
+                            200: '#cad7bd',
+                            300: '#a7bf94',
+                            400: '#83a16d',
+                            500: '#64844f',
+                            600: '#4d6a3c',
+                            700: '#3d5330',
+                            800: '#324328',
+                            900: '#2a3722',
+                            950: '#161f12',
+                        },
+                        beige: {
+                            50: '#faf8f4',
+                            100: '#f3eee4',
+                            200: '#e5dbca',
+                            300: '#d4c4aa',
+                            400: '#beaa86',
+                            500: '#a89066',
+                            600: '#90764f',
+                            700: '#745d3c',
+                            800: '#5f4b32',
+                            900: '#4f3d29',
+                            950: '#2a2015',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Generator JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- HTML5 QR Code Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Printable Document & QR Tag Styling */
+        @media print {
+            body > *:not(#globalPrintArea) {
+                display: none !important;
+            }
+            html body #globalPrintArea,
+            html body #globalPrintArea * {
+                display: block !important;
+                visibility: visible !important;
+            }
+            html body #globalPrintArea {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                z-index: 999999 !important;
+            }
+            #globalPrintArea canvas,
+            #globalPrintArea img {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f3eee4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #beaa86;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #90764f;
+        }
+    </style>
+</head>
+<body class="bg-beige-100 text-olive-950 antialiased min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="bg-olive-950 text-beige-100 shadow-md z-30 sticky top-0 border-b border-olive-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button id="mobileMenuBtn" class="md:hidden text-beige-300 hover:text-white focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-olive-700 text-beige-100 p-2 rounded-lg font-bold flex items-center justify-center w-10 h-10 shadow-lg border border-beige-400/30">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm sm:text-lg tracking-wide uppercase leading-tight text-beige-200">COMISARIA PNP AYACUCHO</h1>
+                        <p class="text-xs text-beige-300/80 hidden sm:block">Sistema Institucional de Control y Gestión de Bienes Patrimoniales</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Auto-Save Status Indicator -->
+                <div class="hidden sm:flex items-center space-x-1.5 bg-olive-900 border border-olive-700 text-beige-200 px-2.5 py-1 rounded-full text-xs" title="Todos los cambios se guardan automáticamente">
+                    <i class="fa-solid fa-floppy-disk text-emerald-400 text-xs"></i>
+                    <span class="text-[11px] font-medium">Auto-Guardado Activo</span>
+                </div>
+
+                <!-- Cloud Status Indicator -->
+                <div id="cloudStatusBadge" class="flex items-center space-x-1.5 bg-olive-900 border border-olive-700 text-beige-300 px-2.5 py-1 rounded-full text-xs" title="Estado de sincronización en la Nube">
+                    <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="cloudStatusText" class="text-[11px] font-medium">Conectando...</span>
+                </div>
+
+                <!-- Google Drive Backup & Import Buttons -->
+                <button onclick="exportDataForGoogleDrive()" title="Guardar copia de seguridad para Google Drive" class="bg-olive-800 hover:bg-olive-700 text-beige-100 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-beige-400/30 transition shadow-sm">
+                    <i class="fa-brands fa-google-drive text-emerald-400 text-sm"></i>
+                    <span class="hidden sm:inline">Respaldar en Drive</span>
+                </button>
+                
+                <label title="Cargar copia de seguridad desde archivo JSON" class="bg-olive-800 hover:bg-olive-700 text-beige-100 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-beige-400/30 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-file-import text-beige-300 text-sm"></i>
+                    <span class="hidden sm:inline">Restaurar</span>
+                    <input type="file" id="importBackupFileInput" onchange="importDataFromBackup(event)" accept=".json" class="hidden">
+                </label>
+
+                <div class="hidden lg:flex flex-col text-right text-xs text-beige-200">
+                    <span id="currentClock" class="font-semibold text-beige-300">00:00:00</span>
+                    <span id="currentDate" class="text-beige-400/80">00/00/0000</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT SIDEBAR -->
+        <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-20 w-64 bg-olive-900 text-beige-200 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col justify-between shadow-xl border-r border-olive-800">
+            <div class="p-4 overflow-y-auto">
+                <div class="mb-6 px-2 py-3 bg-olive-800/80 rounded-lg border border-olive-700/60 flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-full bg-olive-700 flex items-center justify-center text-beige-200 border border-beige-400/30">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-beige-100 truncate">OPERADOR LOGÍSTICO</p>
+                        <p class="text-[10px] text-beige-300 font-mono">CONTROL PATRIMONIAL</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1.5">
+                    <p class="text-[11px] font-bold text-beige-400/80 uppercase tracking-wider px-3 mb-2">Menú Principal</p>
+
+                    <button onclick="switchTab('registrar')" id="nav-registrar" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-beige-200 hover:bg-olive-800 hover:text-white">
+                        <i class="fa-solid fa-circle-plus text-beige-300 w-5"></i>
+                        <span>Registrar bienes</span>
+                    </button>
+
+                    <button onclick="switchTab('verificar')" id="nav-verificar" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-beige-200 hover:bg-olive-800 hover:text-white">
+                        <i class="fa-solid fa-clipboard-check text-beige-300 w-5"></i>
+                        <span>Verificar bienes</span>
+                    </button>
+
+                    <button onclick="switchTab('dar-baja')" id="nav-dar-baja" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-beige-200 hover:bg-olive-800 hover:text-white">
+                        <i class="fa-solid fa-box-archive text-rose-300 w-5"></i>
+                        <span>Dar de baja a bienes</span>
+                    </button>
+
+                    <button onclick="switchTab('reasignar')" id="nav-reasignar" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-beige-200 hover:bg-olive-800 hover:text-white">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-beige-300 w-5"></i>
+                        <span>Reasignar bienes</span>
+                    </button>
+
+                    <button onclick="switchTab('reportes')" id="nav-reportes" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-beige-200 hover:bg-olive-800 hover:text-white">
+                        <i class="fa-solid fa-file-contract text-beige-300 w-5"></i>
+                        <span>Reportes y actas</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Footer Stats summary -->
+            <div class="p-4 bg-olive-950/70 border-t border-olive-800 text-xs text-beige-300 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>Total Bienes Activos:</span>
+                    <span id="statActiveCount" class="font-bold text-beige-200">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Dados de Baja:</span>
+                    <span id="statBajaCount" class="font-bold text-rose-300">0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-olive-950/60 z-10 hidden md:hidden"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-beige-100">
+
+            <!-- TOAST NOTIFICATION CONTAINER -->
+            <div id="toastContainer" class="fixed top-20 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+            <!-- ========================================== -->
+            <!-- SECTION 1: REGISTRAR BIENES -->
+            <!-- ========================================== -->
+            <section id="sec-registrar" class="tab-content hidden space-y-6">
+                <div class="border-b border-beige-300 pb-4">
+                    <h2 class="text-2xl font-bold text-olive-950 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-plus text-olive-700"></i>
+                        Registro de Nuevos Bienes
+                    </h2>
+                    <p class="text-sm text-olive-800/70">Ingrese los datos técnicos del bien patrimonial y genere la etiqueta institucional de código QR.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Form Side -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-beige-300">
+                        <form id="formRegistrarBien" onsubmit="handleRegistrarBien(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Código del bien (PNP) *</label>
+                                    <input type="text" id="regCodigo" required placeholder="Ej: PNP-2026-001" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase font-mono bg-beige-50/30">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Fecha Ingreso a Unidad PNP *</label>
+                                    <input type="date" id="regFechaIngreso" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Estado Físico del Bien *</label>
+                                    <select id="regEstado" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white">
+                                        <option value="Bueno">Bueno</option>
+                                        <option value="Regular">Regular</option>
+                                        <option value="Malo">Malo</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Descripción del bien *</label>
+                                <textarea id="regDescripcion" required rows="2" placeholder="Ej: LAPTOP HP PROBOOK 440 G8 CORE I7 16GB RAM 512GB SSD" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase bg-beige-50/30"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Marca *</label>
+                                    <input type="text" id="regMarca" required placeholder="HP, Lenovo, Toyota..." class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Modelo *</label>
+                                    <input type="text" id="regModelo" required placeholder="ProBook 440..." class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">N° de Serie *</label>
+                                    <input type="text" id="regSerie" required placeholder="5CD1234567" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase font-mono">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-beige-200">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Sección / Dependencia *</label>
+                                    <input type="text" id="regSeccion" required placeholder="Ej: Comisaría Sectorial - Telemática" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Usuario Responsable Asignado *</label>
+                                    <input type="text" id="regUsuario" required placeholder="Ej: ST2 PNP Pérez Gómez Juan" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="pt-4 flex justify-end space-x-3">
+                                <button type="reset" onclick="updateQRPreview()" class="px-4 py-2 border border-beige-300 rounded-lg text-sm font-medium text-olive-800 hover:bg-beige-100 transition">
+                                    Limpiar
+                                </button>
+                                <button type="submit" class="px-6 py-2 bg-olive-700 hover:bg-olive-800 text-beige-100 font-semibold rounded-lg text-sm shadow-sm transition flex items-center gap-2">
+                                    <i class="fa-solid fa-save"></i> Registrar y Guardar Bien
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Live QR Card Preview -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-beige-300 flex flex-col items-center justify-between text-center">
+                        <div class="w-full">
+                            <h3 class="text-xs font-bold text-olive-800/80 uppercase tracking-wider mb-4">Vista Previa - Etiqueta Institucional QR</h3>
+                            
+                            <div id="qrPreviewCard" class="bg-beige-50 border-2 border-dashed border-beige-300 rounded-xl p-4 flex flex-col items-center">
+                                <div class="text-[10px] font-extrabold text-olive-950 uppercase tracking-tight mb-2">
+                                    POLICÍA NACIONAL DEL PERÚ
+                                </div>
+
+                                <div id="qrcodeCanvasContainer" class="bg-white p-3 rounded-lg shadow-inner my-2 flex justify-center items-center min-h-[140px] min-w-[140px]">
+                                    <!-- QR rendered here dynamically -->
+                                </div>
+
+                                <p id="previewPNPCode" class="font-mono font-bold text-olive-950 text-sm tracking-wider my-1">PNP-XXXX</p>
+                                <p id="previewDesc" class="text-xs text-olive-800 line-clamp-2 px-2 uppercase">Descripción del bien...</p>
+                            </div>
+                        </div>
+
+                        <div class="w-full mt-4 space-y-2">
+                            <button type="button" onclick="printLiveQRTag()" class="w-full bg-olive-900 hover:bg-olive-950 text-beige-200 font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow">
+                                <i class="fa-solid fa-print"></i> Imprimir Etiqueta QR
+                            </button>
+                            <p class="text-[11px] text-olive-800/60">El código QR integra automáticamente el Código PNP y la descripción oficial.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table of Registered Assets -->
+                <div class="bg-white rounded-xl shadow-sm border border-beige-300 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-beige-200 bg-beige-50/70 flex justify-between items-center">
+                        <h3 class="font-semibold text-olive-900 text-sm">Listado de Bienes Registrados</h3>
+                        <span id="regResultCount" class="text-xs bg-beige-200 text-olive-900 px-2.5 py-1 rounded-full font-medium">0 bienes</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-beige-100/90 text-[11px] font-bold uppercase text-olive-800 border-b border-beige-300">
+                                    <th class="py-3 px-4">Código PNP</th>
+                                    <th class="py-3 px-4">Descripción del Bien</th>
+                                    <th class="py-3 px-4">Marca / Modelo / Serie</th>
+                                    <th class="py-3 px-4">Sección</th>
+                                    <th class="py-3 px-4">Usuario Responsable</th>
+                                    <th class="py-3 px-4">Estado</th>
+                                    <th class="py-3 px-4">Fecha Ingreso PNP</th>
+                                    <th class="py-3 px-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="regTableBody" class="divide-y divide-beige-200 text-sm">
+                                <!-- Dynamic items -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- SECTION 2: VERIFICAR BIENES -->
+            <!-- ========================================== -->
+            <section id="sec-verificar" class="tab-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-beige-300 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-olive-950 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-olive-700"></i>
+                            Verificación de Bienes Patrimoniales
+                        </h2>
+                        <p class="text-sm text-olive-800/70">Realice auditorías de presencia física y controle la última fecha de verificación.</p>
+                    </div>
+                </div>
+
+                <!-- Verification Modes Controls -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-beige-300 space-y-4">
+                    <p class="text-xs font-bold text-olive-800 uppercase tracking-wider">Verificar por:</p>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button onclick="setVerifFilterMode('bien')" id="vbtn-bien" class="vmode-btn bg-olive-100 text-olive-900 border-olive-400 border font-medium px-4 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-cube"></i> Por Bien
+                        </button>
+                        <button onclick="setVerifFilterMode('seccion')" id="vbtn-seccion" class="vmode-btn bg-beige-50 text-olive-800 border-beige-300 border hover:bg-beige-200 font-medium px-4 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-sitemap"></i> Por Sección
+                        </button>
+                        <button onclick="setVerifFilterMode('usuario')" id="vbtn-usuario" class="vmode-btn bg-beige-50 text-olive-800 border-beige-300 border hover:bg-beige-200 font-medium px-4 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-user"></i> Por Usuario
+                        </button>
+                        <button onclick="openQRScannerModal('verificar')" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-semibold px-4 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm transition">
+                            <i class="fa-solid fa-qrcode text-beige-300"></i> Verificar con QR
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Search/Filter Input -->
+                    <div id="verifFilterInputArea" class="pt-2">
+                        <!-- Populated via JS depending on selected mode -->
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-beige-300 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-beige-200 bg-beige-50/70 flex justify-between items-center">
+                        <h3 class="font-semibold text-olive-900 text-sm">Listado de Bienes para Verificación</h3>
+                        <span id="verifResultCount" class="text-xs bg-beige-200 text-olive-900 px-2.5 py-1 rounded-full font-medium">0 bienes</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-beige-100/90 text-[11px] font-bold uppercase text-olive-800 border-b border-beige-300">
+                                    <th class="py-3 px-4">Código PNP</th>
+                                    <th class="py-3 px-4">Descripción del Bien</th>
+                                    <th class="py-3 px-4">Marca / Modelo / Serie</th>
+                                    <th class="py-3 px-4">Sección</th>
+                                    <th class="py-3 px-4">Usuario Responsable</th>
+                                    <th class="py-3 px-4">Estado</th>
+                                    <th class="py-3 px-4">Última Verificación</th>
+                                    <th class="py-3 px-4 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="verifTableBody" class="divide-y divide-beige-200 text-sm">
+                                <!-- Dynamic items -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- SECTION 3: DAR DE BAJA A BIENES -->
+            <!-- ========================================== -->
+            <section id="sec-dar-baja" class="tab-content hidden space-y-6">
+                <div class="border-b border-beige-300 pb-4">
+                    <h2 class="text-2xl font-bold text-olive-950 flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive text-rose-700"></i>
+                        Dar de Baja a Bienes Patrimoniales
+                    </h2>
+                    <p class="text-sm text-olive-800/70">Busque un bien activo para tramitar su pase a condición de Baja institucional.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-beige-300 space-y-6">
+                    <!-- Smart Autocomplete Search -->
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-2">Buscar bien activo (Buscador Inteligente) o Escanear QR:</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-olive-600">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="bajaSearchInput" oninput="handleSmartSearch('baja')" placeholder="Ingrese Código PNP, Serie, Marca o Descripción..." class="w-full pl-9 pr-4 py-2.5 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                <div id="bajaSearchResults" class="absolute z-20 left-0 right-0 top-full mt-1 bg-white border border-beige-300 rounded-lg shadow-xl hidden max-h-60 overflow-y-auto divide-y divide-beige-200"></div>
+                            </div>
+                            <button onclick="openQRScannerModal('baja')" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-semibold px-4 rounded-lg text-sm flex items-center gap-2 transition whitespace-nowrap shadow">
+                                <i class="fa-solid fa-qrcode text-beige-300"></i> QR
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Asset Form -->
+                    <div id="bajaAssetDetailCard" class="hidden border border-rose-300 bg-rose-50/50 rounded-xl p-5 space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-rose-200 pb-3">
+                            <div>
+                                <span id="bajaSelectedCode" class="font-mono font-bold text-rose-950 bg-rose-100 px-2.5 py-1 rounded text-sm">PNP-0000</span>
+                                <h3 id="bajaSelectedDesc" class="font-bold text-olive-950 text-base mt-1">Descripción del bien</h3>
+                            </div>
+                            <span id="bajaSelectedState" class="text-xs px-2.5 py-1 rounded-full font-bold bg-olive-100 text-olive-900 border border-olive-300">Estado: Bueno</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-olive-900">
+                            <div><strong class="text-olive-950">Marca:</strong> <span id="bajaSelectedMarca">-</span></div>
+                            <div><strong class="text-olive-950">Modelo:</strong> <span id="bajaSelectedModelo">-</span></div>
+                            <div><strong class="text-olive-950">Serie:</strong> <span id="bajaSelectedSerie">-</span></div>
+                            <div><strong class="text-olive-950">Sección:</strong> <span id="bajaSelectedSeccion">-</span></div>
+                            <div class="col-span-2 sm:col-span-4"><strong class="text-olive-950">Usuario Asignado:</strong> <span id="bajaSelectedUsuario">-</span></div>
+                        </div>
+
+                        <!-- Baja Action Form -->
+                        <form id="formConfirmBaja" onsubmit="handleConfirmBaja(event)" class="pt-3 border-t border-rose-200 space-y-4">
+                            <input type="hidden" id="bajaSelectedId">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Fecha de Baja *</label>
+                                    <input type="date" id="bajaFecha" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Motivo / Causal de Baja *</label>
+                                    <select id="bajaMotivo" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                                        <option value="Obsolescencia Técnica">Obsolescencia Técnica</option>
+                                        <option value="Estado Inoperable / Daño Irreparable">Estado Inoperable / Daño Irreparable</option>
+                                        <option value="Pérdida / Sustracción / Robo">Pérdida / Sustracción / Robo</option>
+                                        <option value="Destrucción en Acto de Servicio">Destrucción en Acto de Servicio</option>
+                                        <option value="Transferencia Externa">Transferencia Externa</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Documento Sustentatorio / N° de Resolución</label>
+                                <input type="text" id="bajaDocumento" placeholder="Ej: RESOLUCIÓN DIRECTORAL N° 124-2026-DIRLOG-PNP" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none uppercase">
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" onclick="cancelBajaSelection()" class="px-4 py-2 border border-beige-300 rounded-lg text-sm font-medium text-olive-800 hover:bg-beige-100">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-rose-700 hover:bg-rose-800 text-white font-semibold rounded-lg text-sm shadow-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-box-archive"></i> Registrar Baja Definitiva
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- History of Discharged Assets -->
+                <div class="bg-white rounded-xl shadow-sm border border-beige-300 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-beige-200 bg-beige-50/70">
+                        <h3 class="font-semibold text-olive-950 text-sm">Registro de Bienes Dados de Baja</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-beige-100/90 text-[11px] font-bold uppercase text-olive-800 border-b border-beige-300">
+                                    <th class="py-3 px-4">Código PNP</th>
+                                    <th class="py-3 px-4">Descripción</th>
+                                    <th class="py-3 px-4">Fecha Baja</th>
+                                    <th class="py-3 px-4">Motivo</th>
+                                    <th class="py-3 px-4">Documento Sustento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBajasBody" class="divide-y divide-beige-200 text-sm">
+                                <!-- Dynamic discharged assets -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- SECTION 4: REASIGNAR BIENES -->
+            <!-- ========================================== -->
+            <section id="sec-reasignar" class="tab-content hidden space-y-6">
+                <div class="border-b border-beige-300 pb-4">
+                    <h2 class="text-2xl font-bold text-olive-950 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-olive-700"></i>
+                        Reasignación de Bienes Patrimoniales
+                    </h2>
+                    <p class="text-sm text-olive-800/70">Cambie el usuario asignado o la sección/dependencia responsable del bien.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-beige-300 space-y-6">
+                    <!-- Smart Autocomplete Search -->
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-2">Buscar bien activo a reasignar (Buscador Inteligente) o Escanear QR:</label>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-olive-600">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="text" id="reasigSearchInput" oninput="handleSmartSearch('reasig')" placeholder="Buscar por Código PNP, Serie o Descripción..." class="w-full pl-9 pr-4 py-2.5 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                <div id="reasigSearchResults" class="absolute z-20 left-0 right-0 top-full mt-1 bg-white border border-beige-300 rounded-lg shadow-xl hidden max-h-60 overflow-y-auto divide-y divide-beige-200"></div>
+                            </div>
+                            <button onclick="openQRScannerModal('reasig')" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-semibold px-4 rounded-lg text-sm flex items-center gap-2 transition whitespace-nowrap shadow">
+                                <i class="fa-solid fa-qrcode text-beige-300"></i> QR
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reassignment Form Panel -->
+                    <div id="reasigAssetDetailCard" class="hidden border border-olive-300 bg-olive-50/60 rounded-xl p-5 space-y-5">
+                        <div class="border-b border-olive-200 pb-3 flex justify-between items-start">
+                            <div>
+                                <span id="reasigSelectedCode" class="font-mono font-bold text-olive-950 bg-olive-100 px-2.5 py-1 rounded text-sm border border-olive-300">PNP-0000</span>
+                                <h3 id="reasigSelectedDesc" class="font-bold text-olive-950 text-base mt-1">Descripción del bien</h3>
+                            </div>
+                            <span class="text-xs bg-olive-100 text-olive-900 border border-olive-300 px-2.5 py-1 rounded-full font-bold">Activo</span>
+                        </div>
+
+                        <!-- Current vs New Assignment comparison -->
+                        <form id="formConfirmReasig" onsubmit="handleConfirmReasig(event)" class="space-y-4">
+                            <input type="hidden" id="reasigSelectedId">
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-beige-300">
+                                <!-- Current -->
+                                <div class="space-y-2 border-b md:border-b-0 md:border-r border-beige-200 pb-3 md:pb-0 md:pr-4">
+                                    <p class="text-xs font-bold text-olive-800 uppercase">Asignación Actual:</p>
+                                    <p class="text-xs text-olive-900"><strong>Sección:</strong> <span id="reasigCurrentSeccion" class="text-olive-950">-</span></p>
+                                    <p class="text-xs text-olive-900"><strong>Usuario Responsable:</strong> <span id="reasigCurrentUsuario" class="text-olive-950 font-medium">-</span></p>
+                                </div>
+
+                                <!-- New -->
+                                <div class="space-y-3">
+                                    <p class="text-xs font-bold text-olive-700 uppercase">Nueva Asignación:</p>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-olive-900 mb-1">Nueva Sección / Dependencia *</label>
+                                        <input type="text" id="reasigNuevaSeccion" required class="w-full px-3 py-1.5 border border-beige-300 rounded text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-olive-900 mb-1">Registrar Nuevo Usuario Responsable *</label>
+                                        <input type="text" id="reasigNuevoUsuario" required placeholder="Ej: CAP PNP Ramírez Soto Manuel" class="w-full px-3 py-1.5 border border-beige-300 rounded text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Fecha de Reasignación *</label>
+                                    <input type="date" id="reasigFecha" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Motivo / Pase de Servicio</label>
+                                    <input type="text" id="reasigMotivo" placeholder="Ej: Rotación de personal según Memorándum N° 45" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white uppercase">
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" onclick="cancelReasigSelection()" class="px-4 py-2 border border-beige-300 rounded-lg text-sm font-medium text-olive-800 hover:bg-beige-100">Cancelar</button>
+                                <button type="submit" class="px-5 py-2 bg-olive-700 hover:bg-olive-800 text-beige-100 font-semibold rounded-lg text-sm shadow-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-check-double"></i> Confirmar Reasignación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================== -->
+            <!-- SECTION 5: REPORTES Y ACTAS -->
+            <!-- ========================================== -->
+            <section id="sec-reportes" class="tab-content hidden space-y-6">
+                <div class="border-b border-beige-300 pb-4">
+                    <h2 class="text-2xl font-bold text-olive-950 flex items-center gap-2">
+                        <i class="fa-solid fa-file-contract text-olive-700"></i>
+                        Reportes, Formatos e Historial de Actas
+                    </h2>
+                    <p class="text-sm text-olive-800/70">Cree plantillas de formato personalizadas, consulte trazabilidad y elabore Actas Oficiales.</p>
+                </div>
+
+                <!-- Sub-tabs nav -->
+                <div class="flex flex-wrap border-b border-beige-300 gap-2 sm:gap-6">
+                    <button onclick="switchReportTab('historial')" id="subnav-historial" class="report-subnav-btn font-semibold text-sm pb-2 border-b-2 border-olive-700 text-olive-900">
+                        <i class="fa-solid fa-timeline mr-1.5"></i> Historial por Bien
+                    </button>
+                    <button onclick="switchReportTab('formatos')" id="subnav-formatos" class="report-subnav-btn font-semibold text-sm pb-2 border-b-2 border-transparent text-olive-800/70 hover:text-olive-950">
+                        <i class="fa-solid fa-sliders mr-1.5"></i> Formatos de Acta
+                    </button>
+                    <button onclick="switchReportTab('acta')" id="subnav-acta" class="report-subnav-btn font-semibold text-sm pb-2 border-b-2 border-transparent text-olive-800/70 hover:text-olive-950">
+                        <i class="fa-solid fa-file-signature mr-1.5"></i> Generar Acta de Entrega y Recepción
+                    </button>
+                </div>
+
+                <!-- SUBTAB 1: HISTORIAL DEL BIEN -->
+                <div id="subtab-historial-content" class="space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-beige-300">
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-2">Elegir Bien para ver Historial:</label>
+                        <select id="historialSelectBien" onchange="renderHistorialTimeline()" class="w-full px-3 py-2.5 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                            <option value="">-- Seleccione un bien registrado --</option>
+                        </select>
+                    </div>
+
+                    <!-- Timeline Card Container -->
+                    <div id="historialTimelineContainer" class="bg-white p-6 rounded-xl shadow-sm border border-beige-300">
+                        <p class="text-sm text-olive-800/60 text-center py-6">Seleccione un bien patrimonial de la lista superior para desplegar su hoja de vida y auditoría de eventos.</p>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 2: GESTIONAR FORMATOS DE ACTA -->
+                <div id="subtab-formatos-content" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: List of Available Formats -->
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-beige-300 space-y-4">
+                            <div class="flex justify-between items-center border-b border-beige-200 pb-3">
+                                <h3 class="font-bold text-olive-950 text-sm uppercase">Formatos Disponibles</h3>
+                                <button onclick="createNewFormatTemplate()" class="bg-olive-700 hover:bg-olive-800 text-beige-100 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
+                                    <i class="fa-solid fa-plus"></i> Nuevo Formato
+                                </button>
+                            </div>
+                            <div id="formatTemplatesList" class="space-y-2">
+                                <!-- Dynamic List -->
+                            </div>
+                        </div>
+
+                        <!-- Right: Editor for Selected Format -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-beige-300">
+                            <form id="formEditTemplate" onsubmit="handleSaveTemplate(event)" class="space-y-4">
+                                <input type="hidden" id="tplId">
+                                <div class="flex justify-between items-center border-b border-beige-200 pb-3">
+                                    <h3 class="font-bold text-olive-950 text-base flex items-center gap-2">
+                                        <i class="fa-solid fa-pen-to-square text-olive-700"></i> Editor del Formato de Acta
+                                    </h3>
+                                    <span id="tplBadgeDefault" class="hidden text-xs bg-beige-200 text-olive-950 px-2 py-0.5 rounded font-bold border border-beige-400">Por Defecto</span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Nombre Identificador del Formato *</label>
+                                    <input type="text" id="tplNombre" required placeholder="Ej: Formato Oficial Estándar PNP" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Encabezado Institucional *</label>
+                                        <input type="text" id="tplEncabezado" required placeholder="POLICÍA NACIONAL DEL PERÚ - DIVLOG" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Título Oficial del Acta *</label>
+                                        <input type="text" id="tplTitulo" required placeholder="ACTA DE ENTREGA Y RECEPCIÓN DE BIEN PATRIMONIAL" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase font-bold">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Texto de Cláusula 1: Responsabilidad y Custodia *</label>
+                                    <textarea id="tplClausula1" rows="2" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none"></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Texto de Cláusula 2: Verificación de Estado *</label>
+                                    <textarea id="tplClausula2" rows="2" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none"></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Etiqueta Firma Entregante *</label>
+                                        <input type="text" id="tplFirmaEntregante" required placeholder="ENTREGUÉ CONFORME (RESP. PATRIMONIO)" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm uppercase">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Etiqueta Firma Receptor *</label>
+                                        <input type="text" id="tplFirmaReceptor" required placeholder="RECIBÍ CONFORME (USUARIO RESPONSABLE)" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm uppercase">
+                                    </div>
+                                </div>
+
+                                <div class="pt-3 border-t border-beige-200 flex justify-between items-center">
+                                    <button type="button" onclick="deleteCurrentTemplate()" id="btnDeleteTpl" class="text-rose-700 hover:text-rose-900 text-xs font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-trash"></i> Eliminar Formato
+                                    </button>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="setAsDefaultTemplate()" class="px-4 py-2 bg-beige-100 hover:bg-beige-200 text-olive-900 text-xs font-bold rounded-lg border border-beige-300">Establecer como Predeterminado</button>
+                                        <button type="submit" class="px-5 py-2 bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold rounded-lg text-xs shadow-sm flex items-center gap-1">
+                                            <i class="fa-solid fa-floppy-disk"></i> Guardar Formato
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 3: GENERAR ACTA -->
+                <div id="subtab-acta-content" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-beige-300">
+                        <form id="formGenerarActa" onsubmit="handleGenerarActaPreview(event)" class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-beige-200 pb-2">
+                                <h3 class="font-bold text-olive-950 text-sm uppercase tracking-wide">Datos para el Acta de Entrega y Recepción</h3>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs font-bold text-olive-800 uppercase">Formato a utilizar:</label>
+                                    <select id="actaSelectFormato" class="px-3 py-1 border border-beige-400 bg-beige-50 rounded text-xs font-bold text-olive-950 focus:outline-none">
+                                        <!-- Dynamic format templates list -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Elegir el Bien Patrimonial *</label>
+                                    <select id="actaSelectBien" required onchange="autoFillActaDetails()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                        <!-- populated via JS -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Consignar Fecha del Documento *</label>
+                                    <input type="date" id="actaFecha" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Elegir Sección / Dependencia Receptora *</label>
+                                    <input type="text" id="actaSeccion" required placeholder="Ej: Comisaría Sectorial - Inteligencia" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Elegir Usuario Receptor (A quien se entrega) *</label>
+                                    <input type="text" id="actaUsuario" required placeholder="Ej: SS PNP Ramírez Mendoza Carlos" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Usuario Entregante / Encargado de Logística *</label>
+                                <input type="text" id="actaEntregante" required placeholder="Ej: ST2 PNP MARTÍNEZ J. - RESPONSABLE PATRIMONIAL" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Observaciones / Especificaciones adicionales para el acta</label>
+                                <textarea id="actaObservaciones" rows="2" placeholder="Ej: El bien se entrega en condiciones óptimas de operabilidad con sus respectivos accesorios..." class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none"></textarea>
+                            </div>
+
+                            <div class="pt-4 flex justify-end">
+                                <button type="submit" class="px-6 py-2.5 bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold rounded-lg text-sm shadow-md transition flex items-center gap-2">
+                                    <i class="fa-solid fa-file-pdf"></i> Generar Acta según Formato Seleccionado
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODAL: VERIFICATION RECORD MODAL -->
+    <!-- ========================================== -->
+    <div id="modalVerificar" class="fixed inset-0 z-50 bg-olive-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-beige-300">
+            <div class="bg-olive-950 text-beige-100 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm text-beige-300 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check"></i> Registrar Verificación Presencial
+                </h3>
+                <button onclick="closeModal('modalVerificar')" class="text-beige-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="formRegistrarVerificacion" onsubmit="saveVerificationRecord(event)" class="p-5 space-y-4">
+                <input type="hidden" id="verifModalAssetId">
+                <div>
+                    <p class="text-xs text-olive-800/70">Bien a verificar:</p>
+                    <p id="verifModalCode" class="font-mono font-bold text-olive-950 text-base">PNP-XXXX</p>
+                    <p id="verifModalDesc" class="text-xs text-olive-900">Descripción...</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Fecha de Verificación *</label>
+                        <input type="date" id="verifModalFecha" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Estado Físico Constatado *</label>
+                        <select id="verifModalEstado" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                            <option value="Bueno">Bueno</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Malo">Malo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Observaciones</label>
+                        <textarea id="verifModalObs" rows="2" placeholder="Sin novedad / Accesorios completos..." class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-beige-200">
+                    <button type="button" onclick="closeModal('modalVerificar')" class="px-4 py-2 border border-beige-300 rounded-lg text-xs font-medium text-olive-800 hover:bg-beige-100">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold rounded-lg text-xs shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check"></i> Guardar Verificación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: EDIT ASSET MODAL -->
+    <!-- ========================================== -->
+    <div id="modalEditarBien" class="fixed inset-0 z-50 bg-olive-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl overflow-hidden border border-beige-300 my-8">
+            <div class="bg-olive-950 text-beige-100 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm text-beige-300 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> Modificar Datos del Bien Patrimonial
+                </h3>
+                <button onclick="closeModal('modalEditarBien')" class="text-beige-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="formEditarBien" onsubmit="handleSaveEditedAsset(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editAssetId">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Código PNP *</label>
+                        <input type="text" id="editCodigo" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Fecha Ingreso PNP *</label>
+                        <input type="date" id="editFechaIngreso" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Estado Físico *</label>
+                        <select id="editEstado" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none bg-white">
+                            <option value="Bueno">Bueno</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Malo">Malo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Descripción del bien *</label>
+                    <textarea id="editDescripcion" required rows="2" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Marca *</label>
+                        <input type="text" id="editMarca" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Modelo *</label>
+                        <input type="text" id="editModelo" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">N° Serie *</label>
+                        <input type="text" id="editSerie" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none uppercase font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-beige-200">
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Sección / Dependencia *</label>
+                        <input type="text" id="editSeccion" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Usuario Responsable *</label>
+                        <input type="text" id="editUsuario" required class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-beige-200">
+                    <button type="button" onclick="closeModal('modalEditarBien')" class="px-4 py-2 border border-beige-300 rounded-lg text-xs font-medium text-olive-800 hover:bg-beige-100">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold rounded-lg text-xs shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: INDIVIDUAL QR DISPLAY MODAL -->
+    <!-- ========================================== -->
+    <div id="modalQRTag" class="fixed inset-0 z-50 bg-olive-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl overflow-hidden border border-beige-300">
+            <div class="bg-olive-950 text-beige-100 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm text-beige-300 flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode"></i> Etiqueta Patrimonial QR
+                </h3>
+                <button onclick="closeModal('modalQRTag')" class="text-beige-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 flex flex-col items-center text-center space-y-4">
+                <div class="bg-beige-50 border-2 border-dashed border-beige-300 rounded-xl p-4 w-full flex flex-col items-center">
+                    <div class="text-[10px] font-extrabold text-olive-950 uppercase tracking-tight mb-2">
+                        POLICÍA NACIONAL DEL PERÚ
+                    </div>
+                    <div id="modalQRDisplayCanvas" class="bg-white p-3 rounded-lg shadow-inner my-2 flex justify-center items-center min-h-[140px] min-w-[140px]">
+                    </div>
+                    <p id="modalQRDisplayCode" class="font-mono font-bold text-olive-950 text-sm tracking-wider my-1">PNP-XXXX</p>
+                    <p id="modalQRDisplayDesc" class="text-xs text-olive-800 line-clamp-2 px-2 uppercase">Descripción...</p>
+                    <p id="modalQRDisplaySec" class="text-[10px] text-olive-600 uppercase mt-1">Sección: --</p>
+                </div>
+                <div class="w-full flex gap-2">
+                    <button type="button" onclick="closeModal('modalQRTag')" class="w-1/2 border border-beige-300 rounded-lg text-xs font-semibold py-2 text-olive-800 hover:bg-beige-100">Cerrar</button>
+                    <button type="button" onclick="printCurrentModalQRTag()" class="w-1/2 bg-olive-900 hover:bg-olive-950 text-beige-200 font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow">
+                        <i class="fa-solid fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: CONFIRM DELETION MODAL -->
+    <!-- ========================================== -->
+    <div id="modalConfirmDelete" class="fixed inset-0 z-50 bg-olive-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-beige-300">
+            <div class="bg-rose-950 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Confirmar Eliminación
+                </h3>
+                <button onclick="closeModal('modalConfirmDelete')" class="text-rose-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <p id="confirmDeleteMessage" class="text-sm text-olive-900">¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.</p>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modalConfirmDelete')" class="px-4 py-2 border border-beige-300 rounded-lg text-xs font-medium text-olive-800 hover:bg-beige-100">Cancelar</button>
+                    <button type="button" id="btnConfirmDeleteAction" class="px-5 py-2 bg-rose-700 hover:bg-rose-800 text-white font-bold rounded-lg text-xs shadow-sm">
+                        Sí, Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: QR SCANNER MODAL -->
+    <!-- ========================================== -->
+    <div id="modalQRScanner" class="fixed inset-0 z-50 bg-olive-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-beige-300">
+            <div class="bg-olive-950 text-beige-100 p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm text-beige-300 flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode"></i> Escáner de Código QR Institucional
+                </h3>
+                <button onclick="closeQRScannerModal()" class="text-beige-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="p-5 text-center space-y-4">
+                <!-- Camera view area -->
+                <div id="qr-reader" class="w-full bg-beige-50 rounded-lg overflow-hidden border border-beige-300"></div>
+
+                <div class="border-t border-beige-200 pt-3 space-y-2">
+                    <p class="text-xs text-olive-800/70">¿No tienes cámara disponible? Selecciona manualmente:</p>
+                    <div class="flex gap-2">
+                        <select id="simulatedQRSelect" class="w-full px-3 py-1.5 border border-beige-300 rounded text-xs bg-white">
+                            <!-- Populated with active codes -->
+                        </select>
+                        <button onclick="executeSimulatedQRScan()" class="bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold px-3 py-1.5 rounded text-xs whitespace-nowrap">
+                            Escanear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODAL: PRINTABLE OFFICIAL ACTA PREVIEW -->
+    <!-- ========================================== -->
+    <div id="modalActaPreview" class="fixed inset-0 z-50 bg-olive-950/80 backdrop-blur-md hidden flex justify-center p-2 sm:p-6 overflow-y-auto">
+        <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl my-auto flex flex-col overflow-hidden border border-beige-300">
+            <!-- Modal Bar (Hidden on print) -->
+            <div class="bg-olive-950 text-beige-100 px-6 py-4 flex justify-between items-center no-print border-b border-olive-800">
+                <h3 class="font-bold text-sm text-beige-300 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice"></i> Vista Previa de Documento Oficial (Acta)
+                </h3>
+                <div class="flex items-center gap-3">
+                    <button onclick="printActaDocument()" class="bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold px-4 py-1.5 rounded-lg text-xs flex items-center gap-2 shadow transition border border-beige-400/30">
+                        <i class="fa-solid fa-print"></i> Imprimir / Guardar PDF
+                    </button>
+                    <button onclick="closeModal('modalActaPreview')" class="text-beige-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <!-- PRINTABLE AREA -->
+            <div id="printableActaArea" class="p-8 sm:p-12 text-slate-900 bg-white font-serif leading-relaxed text-sm">
+                <!-- Institutional Header -->
+                <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
+                    <h2 class="font-bold text-base uppercase tracking-wider text-slate-900">POLICÍA NACIONAL DEL PERÚ</h2>
+                    <h3 id="docHeaderSeccion" class="font-semibold text-xs text-slate-700 uppercase">DIVISIÓN INSTITUCIONAL Y CONTROL PATRIMONIAL</h3>
+                    <p class="text-[10px] text-slate-500 font-sans tracking-widest mt-1">"AÑO INSTITUCIONAL DE LA TRANSPARENCIA Y CONTROL LOGÍSTICO"</p>
+                </div>
+
+                <div class="text-center my-6">
+                    <h1 id="docActaTitulo" class="font-extrabold text-xl underline tracking-wide uppercase">ACTA DE ENTREGA Y RECEPCIÓN DE BIEN PATRIMONIAL</h1>
+                    <p class="text-xs text-slate-600 font-sans mt-1">N° <span id="docActaNumero" class="font-mono font-bold">0042-2026-PNP/CP</span></p>
+                </div>
+
+                <!-- Legal / Form Body Text -->
+                <div class="space-y-4 text-justify font-sans text-xs">
+                    <p>
+                        En las instalaciones de la dependencia policial correspondiente, a los <strong id="docFechaTexto" class="underline">-- días del mes de -- del 2026</strong>, se reunieron por una parte el/la 
+                        <strong id="docEntreganteNombre">ST2 PNP PÉREZ GÓMEZ JUAN</strong> en su calidad de Encargado de Control Patrimonial / Entregante, y por otra parte el/la 
+                        <strong id="docReceptorNombre">SO1 PNP MARÍA TORRES L.</strong>, en representación de la sección <strong id="docSeccionNombre">SECRETARÍA COMANDANCIA</strong>, a efecto de hacer constar la entrega y recepción del bien patrimonial que a continuación se detalla:
+                    </p>
+
+                    <!-- Item Details Table -->
+                    <div class="my-4">
+                        <table class="w-full text-left border-collapse border border-slate-800 text-xs font-sans">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-800 uppercase text-[10px] font-bold">
+                                    <th class="p-2 border-r border-slate-800">CÓDIGO PNP</th>
+                                    <th class="p-2 border-r border-slate-800">DESCRIPCIÓN DEL BIEN</th>
+                                    <th class="p-2 border-r border-slate-800">MARCA</th>
+                                    <th class="p-2 border-r border-slate-800">MODELO</th>
+                                    <th class="p-2 border-r border-slate-800">N° SERIE</th>
+                                    <th class="p-2">ESTADO FÍSICO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-slate-800 font-mono">
+                                    <td id="docCode" class="p-2 border-r border-slate-800 font-bold">PNP-2026-000</td>
+                                    <td id="docDesc" class="p-2 border-r border-slate-800 font-sans uppercase">--</td>
+                                    <td id="docMarca" class="p-2 border-r border-slate-800 uppercase">--</td>
+                                    <td id="docModelo" class="p-2 border-r border-slate-800 uppercase">--</td>
+                                    <td id="docSerie" class="p-2 border-r border-slate-800 uppercase">--</td>
+                                    <td id="docEstado" class="p-2 font-sans uppercase">BUENO</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <p><strong>CLÁUSULA PRIMERA (RESPONSABILIDAD):</strong> <span id="docClausula1Texto">El usuario receptor asume la responsabilidad total de la custodia, conservación, buen uso y mantenimiento preventivo del bien patrimonial asignado de acuerdo con la reglamentación interna institucional.</span></p>
+                        <p><strong>CLÁUSULA SEGUNDA (VERIFICACIÓN Y ESTADO):</strong> <span id="docClausula2Texto">El bien patrimonial es entregado en las condiciones físicas descritas en la presente acta, verificándose su operatividad y funcionamiento técnico.</span></p>
+                        <p><strong>OBSERVACIONES:</strong> <span id="docObservacionesTexto">Sin observaciones.</span></p>
+                    </div>
+
+                    <p class="pt-2">
+                        En fe de lo cual, y estando conformes con el contenido de la presente acta, firman los intervinientes en duplicado para los fines administrativos de control patrimonial.
+                    </p>
+                </div>
+
+                <!-- Signatures Grid -->
+                <div class="grid grid-cols-2 gap-12 pt-24 pb-8 font-sans text-xs text-center">
+                    <div class="border-t border-slate-900 pt-2 space-y-1">
+                        <p id="docSigEntregante" class="font-bold text-slate-900 uppercase">ENTREGANTE</p>
+                        <p id="docLabelEntregante" class="text-[10px] text-slate-500 uppercase">ENTREGUÉ CONFORME (RESP. PATRIMONIO)</p>
+                    </div>
+                    <div class="border-t border-slate-900 pt-2 space-y-1">
+                        <p id="docSigReceptor" class="font-bold text-slate-900 uppercase">RECEPTOR</p>
+                        <p id="docLabelReceptor" class="text-[10px] text-slate-500 uppercase">RECIBÍ CONFORME (USUARIO RESPONSABLE)</p>
+                    </div>
+                </div>
+
+                <div class="text-center text-[10px] text-slate-400 font-sans border-t pt-4">
+                    Documento expedido por el Sistema Digital de Control de Bienes PNP. Válido con sello y firma física.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL PRINT CONTAINER (Isolated for clean print execution) -->
+    <div id="globalPrintArea" class="hidden"></div>
+
+    <!-- Firebase Cloud SDK Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.FirebaseSDK = {
+            initializeApp, getAuth, signInAnonymously, signInWithCustomToken,
+            getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, collection
+        };
+
+        if (typeof window.initFirebase === 'function') {
+            window.initFirebase();
+        }
+    </script>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT APP LOGIC persistency & functionality -->
+    <!-- ========================================== -->
+    <script>
+        // Clean Initial State
+        const DEFAULT_TEMPLATES = [
+            {
+                id: 'tpl-estandar',
+                nombre: 'Acta Estándar de Entrega y Recepción',
+                encabezado: 'POLICÍA NACIONAL DEL PERÚ - DIVISIÓN DE LOGÍSTICA PATRIMONIAL',
+                titulo: 'ACTA DE ENTREGA Y RECEPCIÓN DE BIEN PATRIMONIAL',
+                clausula1: 'El usuario receptor asume la responsabilidad total de la custodia, conservación, buen uso y mantenimiento preventivo del bien patrimonial asignado de acuerdo con la reglamentación institucional.',
+                clausula2: 'El bien patrimonial es entregado en las condiciones físicas descritas en la presente acta, verificándose su completa operatividad y componentes técnicos.',
+                firmaEntregante: 'ENTREGUÉ CONFORME (RESP. PATRIMONIO)',
+                firmaReceptor: 'RECIBÍ CONFORME (USUARIO RESPONSABLE)',
+                isDefault: true
+            },
+            {
+                id: 'tpl-prestamo',
+                nombre: 'Acta de Asignación Temporal / Préstamo',
+                encabezado: 'POLICÍA NACIONAL DEL PERÚ - ASIGNACIÓN TEMPORAL DE BIENES',
+                titulo: 'ACTA DE ASIGNACIÓN TEMPORAL EN CALIDAD DE PRÉSTAMO',
+                clausula1: 'El bien se entrega en calidad de préstamo temporal únicamente para el cumplimiento de comisiones de servicio o funciones específicas delegadas.',
+                clausula2: 'El receptor se compromete a devolver el bien patrimonial al término del periodo asignado o a requerimiento inmediato de la Oficina de Logística.',
+                firmaEntregante: 'ENTREGADO EN PRÉSTAMO (LOGÍSTICA)',
+                firmaReceptor: 'RECIBIDO EN CUSTODIA TEMPORAL',
+                isDefault: false
+            }
+        ];
+
+        // Global State
+        let assets = [];
+        let templates = [];
+        let currentVerificationMode = 'bien';
+        let currentQRScanContext = null;
+        let html5QrcodeScanner = null;
+        let qrCodeObj = null;
+        let currentModalQRAsset = null;
+
+        let pendingDeleteId = null;
+        let pendingDeleteType = null;
+
+        // Firebase Cloud Variables
+        let db = null;
+        let auth = null;
+        let user = null;
+
+        // Firebase Cloud Storage Initialization
+        async function initFirebase() {
+            if (!window.FirebaseSDK) return;
+            const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, getFirestore } = window.FirebaseSDK;
+            
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    console.log("Servidor Cloud local: ejecutando persistencia secundaria.");
+                    updateCloudStatus('local');
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                updateCloudStatus('connecting');
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const userCred = await signInWithCustomToken(auth, __initial_auth_token);
+                    user = userCred.user;
+                } else {
+                    const userCred = await signInAnonymously(auth);
+                    user = userCred.user;
+                }
+
+                if (user) {
+                    updateCloudStatus('online');
+                    listenToFirestoreData();
+                }
+            } catch (err) {
+                console.error("Error conectando a la Nube:", err);
+                updateCloudStatus('local');
+            }
+        }
+        window.initFirebase = initFirebase;
+
+        function updateCloudStatus(status) {
+            const dot = document.getElementById('cloudStatusDot');
+            const txt = document.getElementById('cloudStatusText');
+            if (!dot || !txt) return;
+
+            if (status === 'connecting') {
+                dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+                txt.innerText = 'Conectando...';
+            } else if (status === 'online') {
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+                txt.innerText = 'Nube Sincronizada';
+            } else {
+                dot.className = 'w-2 h-2 rounded-full bg-sky-400';
+                txt.innerText = 'Modo Local / Drive';
+            }
+        }
+
+        function listenToFirestoreData() {
+            if (!db || !user || !window.FirebaseSDK) return;
+            const { collection, onSnapshot, doc, setDoc } = window.FirebaseSDK;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'pnp-patrimonio-app';
+
+            // Real-time listener for assets collection
+            const assetsColl = collection(db, 'artifacts', appId, 'public', 'data', 'assets');
+            onSnapshot(assetsColl, (snapshot) => {
+                const loadedAssets = [];
+                snapshot.forEach((docSnap) => {
+                    loadedAssets.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                assets = loadedAssets;
+                saveAssetsToStorage(); // Immediate local auto-save cache synchronization
+                updateStats();
+                renderTablaRegistrados();
+                renderVerificacionView();
+                renderTableBajas();
+                populateReportesDropdowns();
+            }, (error) => {
+                console.error("Error escuchando assets de Firestore:", error);
+            });
+
+            // Real-time listener for templates collection
+            const templatesColl = collection(db, 'artifacts', appId, 'public', 'data', 'templates');
+            onSnapshot(templatesColl, (snapshot) => {
+                const loadedTemplates = [];
+                snapshot.forEach((docSnap) => {
+                    loadedTemplates.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                if (loadedTemplates.length > 0) {
+                    templates = loadedTemplates;
+                } else {
+                    DEFAULT_TEMPLATES.forEach(t => {
+                        const tDoc = doc(db, 'artifacts', appId, 'public', 'data', 'templates', t.id);
+                        setDoc(tDoc, t);
+                    });
+                }
+                saveTemplatesToStorage(); // Immediate local template cache synchronization
+                renderFormatTemplatesList();
+                populateReportesDropdowns();
+            }, (error) => {
+                console.error("Error escuchando templates de Firestore:", error);
+            });
+        }
+
+        async function syncAssetToCloud(asset) {
+            saveAssetsToStorage();
+            if (!db || !user || !window.FirebaseSDK) return;
+            const { doc, setDoc } = window.FirebaseSDK;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'pnp-patrimonio-app';
+            try {
+                const aDoc = doc(db, 'artifacts', appId, 'public', 'data', 'assets', asset.id);
+                await setDoc(aDoc, asset);
+            } catch(err) {
+                console.error("Error al guardar en la nube:", err);
+            }
+        }
+
+        async function deleteAssetFromCloud(assetId) {
+            saveAssetsToStorage();
+            if (!db || !user || !window.FirebaseSDK) return;
+            const { doc, deleteDoc } = window.FirebaseSDK;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'pnp-patrimonio-app';
+            try {
+                const aDoc = doc(db, 'artifacts', appId, 'public', 'data', 'assets', assetId);
+                await deleteDoc(aDoc);
+            } catch(err) {
+                console.error("Error al eliminar en la nube:", err);
+            }
+        }
+
+        async function syncTemplateToCloud(template) {
+            saveTemplatesToStorage();
+            if (!db || !user || !window.FirebaseSDK) return;
+            const { doc, setDoc } = window.FirebaseSDK;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'pnp-patrimonio-app';
+            try {
+                const tDoc = doc(db, 'artifacts', appId, 'public', 'data', 'templates', template.id);
+                await setDoc(tDoc, template);
+            } catch(err) {
+                console.error("Error al guardar formato en la nube:", err);
+            }
+        }
+
+        async function deleteTemplateFromCloud(templateId) {
+            saveTemplatesToStorage();
+            if (!db || !user || !window.FirebaseSDK) return;
+            const { doc, deleteDoc } = window.FirebaseSDK;
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'pnp-patrimonio-app';
+            try {
+                const tDoc = doc(db, 'artifacts', appId, 'public', 'data', 'templates', templateId);
+                await deleteDoc(tDoc);
+            } catch(err) {
+                console.error("Error al eliminar formato en la nube:", err);
+            }
+        }
+
+        // Google Drive Export & Import Backup Helpers
+        function exportDataForGoogleDrive() {
+            const dataToExport = {
+                institucion: "POLICÍA NACIONAL DEL PERÚ - CONTROL PATRIMONIAL",
+                version: "2.0",
+                fechaExportacion: new Date().toISOString(),
+                bienes: assets,
+                formatosActas: templates
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0,10);
+            const fileName = `RESPALDO_BIENES_PNP_${dateStr}.json`;
+            
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast("Archivo de respaldo descargado. Súbalo a su Google Drive para guardarlo.", "success");
+        }
+
+        function importDataFromBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let importedCount = 0;
+
+                    if (parsed.bienes && Array.isArray(parsed.bienes)) {
+                        for (const b of parsed.bienes) {
+                            if (!assets.some(a => a.id === b.id)) {
+                                assets.push(b);
+                                await syncAssetToCloud(b);
+                                importedCount++;
+                            }
+                        }
+                    }
+
+                    if (parsed.formatosActas && Array.isArray(parsed.formatosActas)) {
+                        for (const t of parsed.formatosActas) {
+                            if (!templates.some(tpl => tpl.id === t.id)) {
+                                templates.push(t);
+                                await syncTemplateToCloud(t);
+                            }
+                        }
+                    }
+
+                    saveAssetsToStorage();
+                    saveTemplatesToStorage();
+                    renderTablaRegistrados();
+                    renderVerificacionView();
+                    renderTableBajas();
+                    populateReportesDropdowns();
+
+                    showToast(`Respaldo restaurado: ${importedCount} registro(s) agregados.`, "success");
+                } catch(err) {
+                    showToast("Formato de archivo de respaldo no válido.", "error");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Storage & Persistence Helper Functions
+        function loadStorageData() {
+            const storedAssets = localStorage.getItem('pnp_assets');
+            if (storedAssets) {
+                try {
+                    assets = JSON.parse(storedAssets);
+                } catch (e) {
+                    assets = [];
+                }
+            } else {
+                assets = [];
+            }
+
+            const storedTemplates = localStorage.getItem('pnp_templates');
+            if (storedTemplates) {
+                try {
+                    templates = JSON.parse(storedTemplates);
+                } catch (e) {
+                    templates = [...DEFAULT_TEMPLATES];
+                }
+            } else {
+                templates = [...DEFAULT_TEMPLATES];
+            }
+        }
+
+        function saveAssetsToStorage() {
+            try {
+                localStorage.setItem('pnp_assets', JSON.stringify(assets));
+            } catch(e) {
+                console.error("Error saving assets to localStorage:", e);
+            }
+            updateStats();
+        }
+
+        function saveTemplatesToStorage() {
+            try {
+                localStorage.setItem('pnp_templates', JSON.stringify(templates));
+            } catch(e) {
+                console.error("Error saving templates to localStorage:", e);
+            }
+        }
+
+        function initClock() {
+            function updateClock() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('es-PE');
+                const dateStr = now.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const clockEl = document.getElementById('currentClock');
+                const dateEl = document.getElementById('currentDate');
+                if (clockEl) clockEl.innerText = timeStr;
+                if (dateEl) dateEl.innerText = dateStr;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function openQRTagModal(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            currentModalQRAsset = asset;
+            
+            document.getElementById('modalQRDisplayCode').innerText = asset.codigoPNP;
+            document.getElementById('modalQRDisplayDesc').innerText = asset.descripcion;
+            document.getElementById('modalQRDisplaySec').innerText = `SECCIÓN: ${asset.seccion}`;
+            
+            const container = document.getElementById('modalQRDisplayCanvas');
+            container.innerHTML = '';
+            
+            const safeDesc = asset.descripcion.length > 50 ? asset.descripcion.substring(0, 47) + '...' : asset.descripcion;
+            const qrContent = `PNP-PATRIMONIO|CODIGO:${asset.codigoPNP}|DESC:${safeDesc}`;
+
+            try {
+                new QRCode(container, {
+                    text: qrContent,
+                    width: 140,
+                    height: 140,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch(e) {
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: `PNP-PATRIMONIO|CODIGO:${asset.codigoPNP}`,
+                    width: 140,
+                    height: 140,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            }
+
+            document.getElementById('modalQRTag').classList.remove('hidden');
+        }
+
+        // Dedicated Printing Helper Functions (Universal Iframe & Direct Print Engine)
+        function executePrintHTML(htmlContent) {
+            const printArea = document.getElementById('globalPrintArea');
+            if (printArea) {
+                printArea.innerHTML = htmlContent;
+                printArea.classList.remove('hidden');
+            }
+
+            let iframe = document.getElementById('printIframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'printIframe';
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                iframe.style.zIndex = '-9999';
+                document.body.appendChild(iframe);
+            }
+
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Impresión PNP</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+                        body { font-family: 'Inter', serif, sans-serif; background: white; color: black; margin: 0; padding: 0; }
+                        @media print {
+                            @page { margin: 8mm; size: auto; }
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body class="bg-white text-slate-900">
+                    ${htmlContent}
+                </body>
+                </html>
+            `);
+            doc.close();
+
+            setTimeout(() => {
+                try {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                } catch (err) {
+                    console.warn("Fallback iframe error, invoking window.print():", err);
+                    window.focus();
+                    window.print();
+                } finally {
+                    if (printArea) printArea.classList.add('hidden');
+                }
+            }, 400);
+        }
+
+        function printQRCard(codigo, descripcion, seccion = '') {
+            showToast("Preparando etiqueta QR para impresión...", "info");
+
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            document.body.appendChild(tempDiv);
+
+            const safeDesc = descripcion.length > 50 ? descripcion.substring(0, 47) + '...' : descripcion;
+            const qrPayload = `PNP-PATRIMONIO|CODIGO:${codigo}|DESC:${safeDesc}`;
+
+            try {
+                new QRCode(tempDiv, {
+                    text: qrPayload,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch(e) {
+                tempDiv.innerHTML = '';
+                new QRCode(tempDiv, {
+                    text: `PNP-PATRIMONIO|CODIGO:${codigo}`,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            }
+
+            setTimeout(() => {
+                let qrImgSrc = '';
+                const img = tempDiv.querySelector('img');
+                const canvas = tempDiv.querySelector('canvas');
+                if (img && img.src && img.src.length > 10) {
+                    qrImgSrc = img.src;
+                } else if (canvas) {
+                    qrImgSrc = canvas.toDataURL('image/png');
+                }
+                document.body.removeChild(tempDiv);
+
+                const qrHtml = `
+                    <div style="min-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; background: white;">
+                        <div style="border: 2px dashed #2a3722; border-radius: 12px; padding: 24px; text-align: center; max-width: 320px; width: 100%; background: white;">
+                            <div style="font-size: 11px; font-weight: 800; color: #161f12; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                                POLICÍA NACIONAL DEL PERÚ
+                            </div>
+                            <div style="display: flex; justify-content: center; align-items: center; margin: 12px 0;">
+                                <img src="${qrImgSrc}" style="width: 160px; height: 160px; display: block;" alt="Código QR" />
+                            </div>
+                            <p style="font-family: monospace; font-weight: 700; color: #161f12; font-size: 16px; margin: 8px 0;">${codigo}</p>
+                            <p style="font-size: 11px; color: #324328; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">${descripcion}</p>
+                            ${seccion ? `<p style="font-size: 10px; color: #4d6a3c; text-transform: uppercase; font-weight: 500;">SECCIÓN: ${seccion}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                executePrintHTML(qrHtml);
+            }, 150);
+        }
+
+        function printLiveQRTag() {
+            const code = document.getElementById('regCodigo').value.trim().toUpperCase() || 'PNP-XXXX';
+            const desc = document.getElementById('regDescripcion').value.trim().toUpperCase() || 'DESCRIPCIÓN DEL BIEN';
+            const seccion = document.getElementById('regSeccion').value.trim() || '';
+            printQRCard(code, desc, seccion);
+        }
+
+        function printCurrentModalQRTag() {
+            if (currentModalQRAsset) {
+                printQRCard(currentModalQRAsset.codigoPNP, currentModalQRAsset.descripcion, currentModalQRAsset.seccion);
+            } else {
+                const code = document.getElementById('modalQRDisplayCode').innerText;
+                const desc = document.getElementById('modalQRDisplayDesc').innerText;
+                printQRCard(code, desc);
+            }
+        }
+
+        function printQRCardDirect(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+            printQRCard(asset.codigoPNP, asset.descripcion, asset.seccion);
+        }
+
+        function printActaDocument() {
+            const printableArea = document.getElementById('printableActaArea');
+            if (!printableArea) return;
+
+            showToast("Preparando acta oficial para impresión...", "info");
+            executePrintHTML(printableArea.innerHTML);
+        }
+
+        function printHistorialAsset(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            showToast("Generando historial para impresión...", "info");
+
+            const nowStr = new Date().toLocaleDateString('es-PE') + ' ' + new Date().toLocaleTimeString('es-PE');
+
+            let historyRows = asset.historial.map(h => `
+                <tr style="border-bottom: 1px solid #e5dbca;">
+                    <td style="padding: 8px; font-family: monospace; font-size: 11px; white-space: nowrap;">${h.fecha}</td>
+                    <td style="padding: 8px; font-weight: bold; font-size: 11px; text-transform: uppercase;">${h.tipo}</td>
+                    <td style="padding: 8px; font-size: 11px;">${h.detalle}</td>
+                </tr>
+            `).join('');
+
+            const historialHtml = `
+                <div style="padding: 2rem; color: #161f12; font-family: sans-serif; background: white;">
+                    <div style="text-align: center; border-bottom: 2px solid #2a3722; padding-bottom: 12px; margin-bottom: 20px;">
+                        <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin: 0;">POLICÍA NACIONAL DEL PERÚ</h2>
+                        <h3 style="font-size: 12px; font-weight: 600; color: #3d5330; margin: 4px 0 0 0; text-transform: uppercase;">DIVISIÓN INSTITUCIONAL Y CONTROL PATRIMONIAL</h3>
+                        <p style="font-size: 12px; font-weight: 700; color: #4d6a3c; margin: 8px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">HOJA DE VIDA E HISTORIAL DE TRAZABILIDAD DEL BIEN PATRIMONIAL</p>
+                    </div>
+
+                    <div style="background: #faf8f4; border: 1px solid #d4c4aa; border-radius: 8px; padding: 14px; margin-bottom: 20px; font-size: 11px;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <div><strong>CÓDIGO PNP:</strong> <span style="font-family: monospace; font-weight: 700; color: #3d5330;">${asset.codigoPNP}</span></div>
+                            <div><strong>ESTADO FÍSICO:</strong> ${asset.estado}</div>
+                            <div style="grid-column: span 2;"><strong>DESCRIPCIÓN:</strong> ${asset.descripcion}</div>
+                            <div><strong>MARCA / MODELO:</strong> ${asset.marca} / ${asset.modelo}</div>
+                            <div><strong>N° SERIE:</strong> <span style="font-family: monospace;">${asset.serie}</span></div>
+                            <div><strong>SECCIÓN ACTUAL:</strong> ${asset.seccion}</div>
+                            <div><strong>USUARIO RESPONSABLE:</strong> ${asset.usuario}</div>
+                            <div><strong>FECHA INGRESO UNIDAD:</strong> ${asset.fechaIngreso || asset.fechaRegistro}</div>
+                            <div><strong>CONDICIÓN PATRIMONIAL:</strong> ${asset.esBaja ? 'DADO DE BAJA' : 'ACTIVO'}</div>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #161f12; padding-bottom: 4px;">HISTORIAL DE REGISTROS Y EVENTOS AUDITADOS</h4>
+                    
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 30px;">
+                        <thead>
+                            <tr style="background: #e4eadb; border-bottom: 2px solid #2a3722; font-size: 10px; text-transform: uppercase;">
+                                <th style="padding: 8px; width: 100px;">FECHA</th>
+                                <th style="padding: 8px; width: 130px;">TIPO REGISTRO</th>
+                                <th style="padding: 8px;">DETALLE DE LA ACCIÓN / INCIDENCIA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${historyRows}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 10px; color: #5f4b32; border-top: 1px solid #e5dbca; padding-top: 12px;">
+                        <span>Fecha y hora de emisión del reporte: ${nowStr}</span>
+                        <span>Documento Oficial de Trazabilidad Patrimonial PNP</span>
+                    </div>
+                </div>
+            `;
+
+            executePrintHTML(historialHtml);
+        }
+
+        // Initialization
+        window.onload = function() {
+            loadStorageData();
+            initClock();
+            switchTab('registrar');
+            setupMobileMenu();
+            updateStats();
+            initDefaultDates();
+        };
+
+        function initDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const regInput = document.getElementById('regFechaIngreso');
+            if (regInput && !regInput.value) {
+                regInput.value = today;
+            }
+        }
+
+        // Navigation Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-olive-800', 'text-white', 'border-l-4', 'border-beige-400');
+                btn.classList.add('text-beige-200');
+            });
+
+            const selectedSec = document.getElementById(`sec-${tabId}`);
+            const selectedBtn = document.getElementById(`nav-${tabId}`);
+
+            if (selectedSec) selectedSec.classList.remove('hidden');
+            if (selectedBtn) {
+                selectedBtn.classList.add('bg-olive-800', 'text-white', 'border-l-4', 'border-beige-400');
+                selectedBtn.classList.remove('text-beige-200');
+            }
+
+            closeMobileMenu();
+
+            if (tabId === 'verificar') renderVerificacionView();
+            if (tabId === 'registrar') {
+                initDefaultDates();
+                updateQRPreview();
+                renderTablaRegistrados();
+            }
+            if (tabId === 'dar-baja') renderTableBajas();
+            if (tabId === 'reportes') populateReportesDropdowns();
+        }
+
+        function switchReportTab(subId) {
+            document.querySelectorAll('.report-subnav-btn').forEach(b => {
+                b.classList.remove('border-olive-700', 'text-olive-900');
+                b.classList.add('border-transparent', 'text-olive-800/70');
+            });
+            document.getElementById(`subtab-historial-content`).classList.add('hidden');
+            document.getElementById(`subtab-formatos-content`).classList.add('hidden');
+            document.getElementById(`subtab-acta-content`).classList.add('hidden');
+
+            document.getElementById(`subnav-${subId}`).classList.add('border-olive-700', 'text-olive-900');
+            document.getElementById(`subnav-${subId}`).classList.remove('border-transparent', 'text-olive-800/70');
+            document.getElementById(`subtab-${subId}-content`).classList.remove('hidden');
+
+            if (subId === 'historial') renderHistorialTimeline();
+            if (subId === 'formatos') renderFormatTemplatesList();
+            if (subId === 'acta') populateReportesDropdowns();
+        }
+
+        // Mobile Sidebar Toggles
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            });
+
+            overlay.addEventListener('click', closeMobileMenu);
+        }
+
+        function closeMobileMenu() {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.add('hidden');
+        }
+
+        // UI Toast Messages
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-olive-950 border-beige-400 text-beige-100';
+            let icon = 'fa-circle-info text-beige-300';
+
+            if (type === 'success') {
+                bg = 'bg-olive-900 border-olive-400 text-beige-100';
+                icon = 'fa-circle-check text-olive-300';
+            } else if (type === 'error') {
+                bg = 'bg-rose-950 border-rose-500 text-white';
+                icon = 'fa-triangle-exclamation text-rose-300';
+            }
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl border-l-4 ${bg} transition-all duration-300 transform translate-y-2 text-xs font-medium max-w-xs`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${msg}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function updateStats() {
+            const active = assets.filter(a => !a.esBaja).length;
+            const baja = assets.filter(a => a.esBaja).length;
+            document.getElementById('statActiveCount').innerText = active;
+            document.getElementById('statBajaCount').innerText = baja;
+        }
+
+
+        /* ====================================================
+           SECTION 1: VERIFICAR BIENES LOGIC
+        ==================================================== */
+        function setVerifFilterMode(mode) {
+            currentVerificationMode = mode;
+            document.querySelectorAll('.vmode-btn').forEach(b => {
+                b.classList.remove('bg-olive-100', 'text-olive-900', 'border-olive-400');
+                b.classList.add('bg-beige-50', 'text-olive-800', 'border-beige-300');
+            });
+            const activeBtn = document.getElementById(`vbtn-${mode}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-olive-100', 'text-olive-900', 'border-olive-400');
+                activeBtn.classList.remove('bg-beige-50', 'text-olive-800', 'border-beige-300');
+            }
+
+            renderVerificInputArea();
+            renderVerificacionView();
+        }
+
+        function renderVerificInputArea() {
+            const container = document.getElementById('verifFilterInputArea');
+            container.innerHTML = '';
+
+            if (currentVerificationMode === 'bien') {
+                container.innerHTML = `
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-olive-600">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="verifSearchInput" oninput="renderVerificacionView()" placeholder="Buscar bien por código PNP, serie o descripción..." class="w-full pl-9 pr-4 py-2 border border-beige-300 rounded-lg text-sm focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                    </div>
+                `;
+            } else if (currentVerificationMode === 'seccion') {
+                const seccioneSet = [...new Set(assets.filter(a => !a.esBaja).map(a => a.seccion))];
+                let options = seccioneSet.map(s => `<option value="${s}">${s}</option>`).join('');
+                container.innerHTML = `
+                    <select id="verifSelectSeccion" onchange="renderVerificacionView()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                        <option value="">-- Todas las Secciones / Dependencias --</option>
+                        ${options}
+                    </select>
+                `;
+            } else if (currentVerificationMode === 'usuario') {
+                const usuariosSet = [...new Set(assets.filter(a => !a.esBaja).map(a => a.usuario))];
+                let options = usuariosSet.map(u => `<option value="${u}">${u}</option>`).join('');
+                container.innerHTML = `
+                    <select id="verifSelectUsuario" onchange="renderVerificacionView()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                        <option value="">-- Todos los Usuarios Responsables --</option>
+                        ${options}
+                    </select>
+                `;
+            }
+        }
+
+        function renderVerificacionView() {
+            if (!document.getElementById('verifFilterInputArea').firstElementChild) {
+                renderVerificInputArea();
+            }
+
+            let filtered = assets.filter(a => !a.esBaja);
+
+            if (currentVerificationMode === 'bien') {
+                const query = document.getElementById('verifSearchInput')?.value.toLowerCase().trim() || '';
+                if (query) {
+                    filtered = filtered.filter(a => 
+                        a.codigoPNP.toLowerCase().includes(query) ||
+                        a.descripcion.toLowerCase().includes(query) ||
+                        a.serie.toLowerCase().includes(query) ||
+                        a.marca.toLowerCase().includes(query)
+                    );
+                }
+            } else if (currentVerificationMode === 'seccion') {
+                const secVal = document.getElementById('verifSelectSeccion')?.value || '';
+                if (secVal) filtered = filtered.filter(a => a.seccion === secVal);
+            } else if (currentVerificationMode === 'usuario') {
+                const usrVal = document.getElementById('verifSelectUsuario')?.value || '';
+                if (usrVal) filtered = filtered.filter(a => a.usuario === usrVal);
+            }
+
+            const tbody = document.getElementById('verifTableBody');
+            document.getElementById('verifResultCount').innerText = `${filtered.length} bienes`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-olive-800/60">No se encontraron bienes registrados para verificación.</td></tr>`;
+                return;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            tbody.innerHTML = filtered.map(a => {
+                const verificadoHoy = a.ultimaVerificacion === todayStr;
+                return `
+                    <tr class="hover:bg-beige-50 transition">
+                        <td class="py-3 px-4 font-mono font-bold text-olive-950">${a.codigoPNP}</td>
+                        <td class="py-3 px-4 font-medium text-olive-900 max-w-xs truncate" title="${a.descripcion}">${a.descripcion}</td>
+                        <td class="py-3 px-4 text-xs text-olive-800">${a.marca} / ${a.modelo} / <span class="font-mono">${a.serie}</span></td>
+                        <td class="py-3 px-4 text-xs text-olive-800">${a.seccion}</td>
+                        <td class="py-3 px-4 text-xs text-olive-900 font-medium">${a.usuario}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${getStateBadgeClass(a.estado)}">${a.estado}</span>
+                        </td>
+                        <td class="py-3 px-4 text-xs">
+                            ${verificadoHoy ? 
+                                `<span class="text-olive-700 font-bold flex items-center gap-1"><i class="fa-solid fa-check"></i> ${a.ultimaVerificacion} (Hoy)</span>` : 
+                                `<span class="text-olive-800/70">${a.ultimaVerificacion || 'Sin verificar'}</span>`}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="openQRTagModal('${a.id}')" title="Imprimir QR" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-medium px-2.5 py-1 rounded text-xs shadow-sm transition flex items-center gap-1">
+                                    <i class="fa-solid fa-qrcode text-beige-300"></i> Imprimir QR
+                                </button>
+                                <button onclick="openVerificationModal('${a.id}')" title="Verificar Estado" class="bg-olive-700 hover:bg-olive-800 text-beige-100 font-bold px-2.5 py-1 rounded text-xs shadow-sm transition flex items-center gap-1">
+                                    <i class="fa-solid fa-square-check"></i> Verificar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStateBadgeClass(estado) {
+            if (estado === 'Bueno') return 'bg-olive-100 text-olive-900 border border-olive-300';
+            if (estado === 'Regular') return 'bg-beige-200 text-beige-950 border border-beige-400';
+            return 'bg-rose-100 text-rose-900 border border-rose-300';
+        }
+
+        function openVerificationModal(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            document.getElementById('verifModalAssetId').value = asset.id;
+            document.getElementById('verifModalCode').innerText = asset.codigoPNP;
+            document.getElementById('verifModalDesc').innerText = asset.descripcion;
+            document.getElementById('verifModalFecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('verifModalEstado').value = asset.estado;
+            document.getElementById('verifModalObs').value = '';
+
+            document.getElementById('modalVerificar').classList.remove('hidden');
+        }
+
+        function saveVerificationRecord(e) {
+            e.preventDefault();
+            const id = document.getElementById('verifModalAssetId').value;
+            const fecha = document.getElementById('verifModalFecha').value;
+            const estado = document.getElementById('verifModalEstado').value;
+            const obs = document.getElementById('verifModalObs').value.trim();
+
+            const asset = assets.find(a => a.id === id);
+            if (asset) {
+                asset.ultimaVerificacion = fecha;
+                asset.estado = estado;
+                asset.historial.unshift({
+                    fecha: fecha,
+                    tipo: 'Verificación',
+                    detalle: `Verificación presencial registrada. Estado: ${estado}.${obs ? ' Obs: ' + obs : ''}`
+                });
+
+                syncAssetToCloud(asset);
+                closeModal('modalVerificar');
+                showToast(`Bien ${asset.codigoPNP} verificado con éxito.`, 'success');
+                renderVerificacionView();
+            }
+        }
+
+
+        /* ====================================================
+           SECTION 2: REGISTRAR BIENES LOGIC & QR GENERATION
+        ==================================================== */
+        function updateQRPreview() {
+            const code = document.getElementById('regCodigo').value.trim().toUpperCase() || 'PNP-XXXX';
+            const desc = document.getElementById('regDescripcion').value.trim().toUpperCase() || 'DESCRIPCIÓN DEL BIEN';
+
+            document.getElementById('previewPNPCode').innerText = code;
+            document.getElementById('previewDesc').innerText = desc;
+
+            const container = document.getElementById('qrcodeCanvasContainer');
+            container.innerHTML = '';
+            
+            const safeDesc = desc.length > 50 ? desc.substring(0, 47) + '...' : desc;
+            const qrContent = `PNP-PATRIMONIO|CODIGO:${code}|DESC:${safeDesc}`;
+
+            try {
+                qrCodeObj = new QRCode(container, {
+                    text: qrContent,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (err) {
+                container.innerHTML = '';
+                qrCodeObj = new QRCode(container, {
+                    text: `PNP-PATRIMONIO|CODIGO:${code}`,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#161f12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+            }
+        }
+
+        document.getElementById('regCodigo').addEventListener('input', updateQRPreview);
+        document.getElementById('regDescripcion').addEventListener('input', updateQRPreview);
+
+        function handleRegistrarBien(e) {
+            e.preventDefault();
+
+            const codigoPNP = document.getElementById('regCodigo').value.trim().toUpperCase();
+            
+            if (assets.some(a => a.codigoPNP === codigoPNP)) {
+                showToast(`El código ${codigoPNP} ya se encuentra registrado.`, 'error');
+                return;
+            }
+
+            const fechaIngreso = document.getElementById('regFechaIngreso').value || new Date().toISOString().split('T')[0];
+
+            const newAsset = {
+                id: Date.now().toString(),
+                codigoPNP: codigoPNP,
+                fechaIngreso: fechaIngreso,
+                descripcion: document.getElementById('regDescripcion').value.trim().toUpperCase(),
+                marca: document.getElementById('regMarca').value.trim().toUpperCase(),
+                modelo: document.getElementById('regModelo').value.trim().toUpperCase(),
+                serie: document.getElementById('regSerie').value.trim().toUpperCase(),
+                estado: document.getElementById('regEstado').value,
+                seccion: document.getElementById('regSeccion').value.trim(),
+                usuario: document.getElementById('regUsuario').value.trim(),
+                fechaRegistro: new Date().toISOString().split('T')[0],
+                ultimaVerificacion: new Date().toISOString().split('T')[0],
+                esBaja: false,
+                historial: [
+                    {
+                        fecha: fechaIngreso,
+                        tipo: 'Registro',
+                        detalle: `Ingreso oficial a la Unidad PNP el ${fechaIngreso}. Registrado en el sistema.`
+                    }
+                ]
+            };
+
+            assets.unshift(newAsset);
+            syncAssetToCloud(newAsset);
+
+            showToast(`Bien ${newAsset.codigoPNP} registrado correctamente.`, 'success');
+            
+            document.getElementById('formRegistrarBien').reset();
+            initDefaultDates();
+            updateQRPreview();
+            renderTablaRegistrados();
+        }
+
+        function renderTablaRegistrados() {
+            const tbody = document.getElementById('regTableBody');
+            if (!tbody) return;
+
+            const registeredAssets = assets;
+            document.getElementById('regResultCount').innerText = `${registeredAssets.length} bienes`;
+
+            if (registeredAssets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-olive-800/60">No hay bienes registrados aún.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = registeredAssets.map(a => `
+                <tr class="hover:bg-beige-50 transition ${a.esBaja ? 'bg-beige-100/60 opacity-60' : ''}">
+                    <td class="py-3 px-4 font-mono font-bold text-olive-950">${a.codigoPNP}</td>
+                    <td class="py-3 px-4 font-medium text-olive-900 max-w-xs truncate" title="${a.descripcion}">${a.descripcion}</td>
+                    <td class="py-3 px-4 text-xs text-olive-800">${a.marca} / ${a.modelo} / <span class="font-mono">${a.serie}</span></td>
+                    <td class="py-3 px-4 text-xs text-olive-800">${a.seccion}</td>
+                    <td class="py-3 px-4 text-xs text-olive-900 font-medium">${a.usuario}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${getStateBadgeClass(a.estado)}">${a.estado}</span>
+                        ${a.esBaja ? '<span class="ml-1 text-[10px] text-rose-700 font-bold">(BAJA)</span>' : ''}
+                    </td>
+                    <td class="py-3 px-4 text-xs font-mono text-olive-800/80">${a.fechaIngreso || a.fechaRegistro || '-'}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="openQRTagModal('${a.id}')" title="Ver / Imprimir QR" class="bg-olive-900 hover:bg-olive-950 text-beige-200 p-1.5 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </button>
+                            <button onclick="openEditAssetModal('${a.id}')" title="Modificar Datos" class="bg-olive-600 hover:bg-olive-700 text-white p-1.5 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="confirmDeleteAsset('${a.id}')" title="Eliminar Bien" class="bg-rose-700 hover:bg-rose-800 text-white p-1.5 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openEditAssetModal(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            document.getElementById('editAssetId').value = asset.id;
+            document.getElementById('editCodigo').value = asset.codigoPNP;
+            document.getElementById('editFechaIngreso').value = asset.fechaIngreso || asset.fechaRegistro || new Date().toISOString().split('T')[0];
+            document.getElementById('editDescripcion').value = asset.descripcion;
+            document.getElementById('editMarca').value = asset.marca;
+            document.getElementById('editModelo').value = asset.modelo;
+            document.getElementById('editSerie').value = asset.serie;
+            document.getElementById('editEstado').value = asset.estado;
+            document.getElementById('editSeccion').value = asset.seccion;
+            document.getElementById('editUsuario').value = asset.usuario;
+
+            document.getElementById('modalEditarBien').classList.remove('hidden');
+        }
+
+        function handleSaveEditedAsset(e) {
+            e.preventDefault();
+            const id = document.getElementById('editAssetId').value;
+            const asset = assets.find(a => a.id === id);
+            if (!asset) return;
+
+            const newCode = document.getElementById('editCodigo').value.trim().toUpperCase();
+            
+            if (newCode !== asset.codigoPNP && assets.some(a => a.id !== id && a.codigoPNP === newCode)) {
+                showToast(`El código ${newCode} ya pertenece a otro bien.`, 'error');
+                return;
+            }
+
+            asset.codigoPNP = newCode;
+            asset.fechaIngreso = document.getElementById('editFechaIngreso').value;
+            asset.descripcion = document.getElementById('editDescripcion').value.trim().toUpperCase();
+            asset.marca = document.getElementById('editMarca').value.trim().toUpperCase();
+            asset.modelo = document.getElementById('editModelo').value.trim().toUpperCase();
+            asset.serie = document.getElementById('editSerie').value.trim().toUpperCase();
+            asset.estado = document.getElementById('editEstado').value;
+            asset.seccion = document.getElementById('editSeccion').value.trim();
+            asset.usuario = document.getElementById('editUsuario').value.trim();
+
+            asset.historial.unshift({
+                fecha: new Date().toISOString().split('T')[0],
+                tipo: 'Modificación',
+                detalle: 'Datos técnicos o fecha de ingreso del bien modificados.'
+            });
+
+            syncAssetToCloud(asset);
+            closeModal('modalEditarBien');
+            showToast(`Bien ${asset.codigoPNP} actualizado correctamente.`, 'success');
+            
+            renderTablaRegistrados();
+            if (document.getElementById('sec-verificar') && !document.getElementById('sec-verificar').classList.contains('hidden')) {
+                renderVerificacionView();
+            }
+        }
+
+        function confirmDeleteAsset(assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            pendingDeleteId = assetId;
+            pendingDeleteType = 'asset';
+
+            document.getElementById('confirmDeleteMessage').innerText = `¿Está seguro de eliminar permanentemente el bien "${asset.codigoPNP} - ${asset.descripcion}"? Esta acción no se puede deshacer.`;
+            
+            const btn = document.getElementById('btnConfirmDeleteAction');
+            btn.onclick = executePendingDelete;
+
+            document.getElementById('modalConfirmDelete').classList.remove('hidden');
+        }
+
+        function deleteCurrentTemplate() {
+            const id = document.getElementById('tplId').value;
+            if (templates.length <= 1) {
+                showToast("Debe existir al menos un formato de acta registrado.", "error");
+                return;
+            }
+
+            const t = templates.find(item => item.id === id);
+            pendingDeleteId = id;
+            pendingDeleteType = 'template';
+
+            document.getElementById('confirmDeleteMessage').innerText = `¿Está seguro de eliminar el formato "${t ? t.nombre : 'seleccionado'}"?`;
+
+            const btn = document.getElementById('btnConfirmDeleteAction');
+            btn.onclick = executePendingDelete;
+
+            document.getElementById('modalConfirmDelete').classList.remove('hidden');
+        }
+
+        function executePendingDelete() {
+            if (pendingDeleteType === 'asset' && pendingDeleteId) {
+                const deletedCode = assets.find(a => a.id === pendingDeleteId)?.codigoPNP || '';
+                assets = assets.filter(a => a.id !== pendingDeleteId);
+                deleteAssetFromCloud(pendingDeleteId);
+                showToast(`Bien ${deletedCode} eliminado correctamente.`, 'success');
+                renderTablaRegistrados();
+                renderVerificacionView();
+                renderTableBajas();
+                updateStats();
+            } else if (pendingDeleteType === 'template' && pendingDeleteId) {
+                templates = templates.filter(t => t.id !== pendingDeleteId);
+                deleteTemplateFromCloud(pendingDeleteId);
+                if (!templates.some(t => t.isDefault)) {
+                    templates[0].isDefault = true;
+                    syncTemplateToCloud(templates[0]);
+                }
+                document.getElementById('tplId').value = '';
+                renderFormatTemplatesList();
+                showToast("Formato eliminado.", "success");
+            }
+
+            closeModal('modalConfirmDelete');
+            pendingDeleteId = null;
+            pendingDeleteType = null;
+        }
+
+        function printQRTagModal() {
+            window.print();
+        }
+
+
+        /* ====================================================
+           SECTION 3: DAR DE BAJA LOGIC
+        ==================================================== */
+        function handleSmartSearch(type) {
+            const input = document.getElementById(`${type}SearchInput`);
+            const results = document.getElementById(`${type}SearchResults`);
+            const query = input.value.toLowerCase().trim();
+
+            if (!query) {
+                results.classList.add('hidden');
+                return;
+            }
+
+            const matched = assets.filter(a => !a.esBaja && (
+                a.codigoPNP.toLowerCase().includes(query) ||
+                a.descripcion.toLowerCase().includes(query) ||
+                a.serie.toLowerCase().includes(query) ||
+                a.marca.toLowerCase().includes(query)
+            ));
+
+            if (matched.length === 0) {
+                results.innerHTML = `<div class="p-3 text-xs text-olive-800/60 text-center">No se encontraron bienes coincidentes.</div>`;
+            } else {
+                results.innerHTML = matched.map(a => `
+                    <div onclick="selectAssetForBajaOrReasig('${type}', '${a.id}')" class="p-3 hover:bg-beige-100 cursor-pointer transition">
+                        <div class="flex justify-between items-center">
+                            <span class="font-mono font-bold text-xs text-olive-950">${a.codigoPNP}</span>
+                            <span class="text-[10px] bg-beige-200 text-olive-900 px-2 py-0.5 rounded font-medium">${a.seccion}</span>
+                        </div>
+                        <div class="text-xs font-semibold text-olive-900 truncate">${a.descripcion}</div>
+                        <div class="text-[11px] text-olive-800/70">Serie: ${a.serie} | Responsable: ${a.usuario}</div>
+                    </div>
+                `).join('');
+            }
+
+            results.classList.remove('hidden');
+        }
+
+        function selectAssetForBajaOrReasig(type, assetId) {
+            const asset = assets.find(a => a.id === assetId);
+            if (!asset) return;
+
+            document.getElementById(`${type}SearchResults`).classList.add('hidden');
+            document.getElementById(`${type}SearchInput`).value = asset.codigoPNP;
+
+            if (type === 'baja') {
+                document.getElementById('bajaSelectedId').value = asset.id;
+                document.getElementById('bajaSelectedCode').innerText = asset.codigoPNP;
+                document.getElementById('bajaSelectedDesc').innerText = asset.descripcion;
+                document.getElementById('bajaSelectedState').innerText = `Estado: ${asset.estado}`;
+                document.getElementById('bajaSelectedMarca').innerText = asset.marca;
+                document.getElementById('bajaSelectedModelo').innerText = asset.modelo;
+                document.getElementById('bajaSelectedSerie').innerText = asset.serie;
+                document.getElementById('bajaSelectedSeccion').innerText = asset.seccion;
+                document.getElementById('bajaSelectedUsuario').innerText = asset.usuario;
+                document.getElementById('bajaFecha').value = new Date().toISOString().split('T')[0];
+
+                document.getElementById('bajaAssetDetailCard').classList.remove('hidden');
+            } else if (type === 'reasig') {
+                document.getElementById('reasigSelectedId').value = asset.id;
+                document.getElementById('reasigSelectedCode').innerText = asset.codigoPNP;
+                document.getElementById('reasigSelectedDesc').innerText = asset.descripcion;
+                document.getElementById('reasigCurrentSeccion').innerText = asset.seccion;
+                document.getElementById('reasigCurrentUsuario').innerText = asset.usuario;
+                
+                document.getElementById('reasigNuevaSeccion').value = asset.seccion;
+                document.getElementById('reasigNuevoUsuario').value = '';
+                document.getElementById('reasigFecha').value = new Date().toISOString().split('T')[0];
+
+                document.getElementById('reasigAssetDetailCard').classList.remove('hidden');
+            }
+        }
+
+        function cancelBajaSelection() {
+            document.getElementById('bajaAssetDetailCard').classList.add('hidden');
+            document.getElementById('bajaSearchInput').value = '';
+        }
+
+        function handleConfirmBaja(e) {
+            e.preventDefault();
+            const id = document.getElementById('bajaSelectedId').value;
+            const fecha = document.getElementById('bajaFecha').value;
+            const motivo = document.getElementById('bajaMotivo').value;
+            const doc = document.getElementById('bajaDocumento').value.trim().toUpperCase();
+
+            const asset = assets.find(a => a.id === id);
+            if (asset) {
+                asset.esBaja = true;
+                asset.bajaFecha = fecha;
+                asset.bajaMotivo = motivo;
+                asset.bajaDocumento = doc || 'S/N';
+                asset.historial.unshift({
+                    fecha: fecha,
+                    tipo: 'Baja',
+                    detalle: `Proceso de Baja registrado. Motivo: ${motivo}. Doc: ${doc || 'S/N'}`
+                });
+
+                syncAssetToCloud(asset);
+                showToast(`El bien ${asset.codigoPNP} ha sido dado de baja.`, 'success');
+                cancelBajaSelection();
+                renderTableBajas();
+            }
+        }
+
+        function renderTableBajas() {
+            const tbody = document.getElementById('tableBajasBody');
+            const bajas = assets.filter(a => a.esBaja);
+
+            if (bajas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-olive-800/60">No existen bienes dados de baja actualmente.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = bajas.map(a => `
+                <tr class="hover:bg-beige-50 transition">
+                    <td class="py-3 px-4 font-mono font-bold text-rose-800">${a.codigoPNP}</td>
+                    <td class="py-3 px-4 font-medium text-olive-900">${a.descripcion}</td>
+                    <td class="py-3 px-4 text-xs font-semibold text-olive-800">${a.bajaFecha || '-'}</td>
+                    <td class="py-3 px-4 text-xs text-rose-700 font-bold">${a.bajaMotivo || '-'}</td>
+                    <td class="py-3 px-4 text-xs font-mono text-olive-800/80">${a.bajaDocumento || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+
+        /* ====================================================
+           SECTION 4: REASIGNAR BIENES LOGIC
+        ==================================================== */
+        function cancelReasigSelection() {
+            document.getElementById('reasigAssetDetailCard').classList.add('hidden');
+            document.getElementById('reasigSearchInput').value = '';
+        }
+
+        function handleConfirmReasig(e) {
+            e.preventDefault();
+            const id = document.getElementById('reasigSelectedId').value;
+            const nuevaSec = document.getElementById('reasigNuevaSeccion').value.trim();
+            const nuevoUsr = document.getElementById('reasigNuevoUsuario').value.trim();
+            const fecha = document.getElementById('reasigFecha').value;
+            const motivo = document.getElementById('reasigMotivo').value.trim().toUpperCase();
+
+            const asset = assets.find(a => a.id === id);
+            if (asset) {
+                const prevUsr = asset.usuario;
+                const prevSec = asset.seccion;
+
+                asset.seccion = nuevaSec;
+                asset.usuario = nuevoUsr;
+                asset.historial.unshift({
+                    fecha: fecha,
+                    tipo: 'Reasignación',
+                    detalle: `Reasignado de ${prevUsr} (${prevSec}) a ${nuevoUsr} (${nuevaSec}). ${motivo ? 'Motivo: ' + motivo : ''}`
+                });
+
+                syncAssetToCloud(asset);
+                showToast(`El bien ${asset.codigoPNP} fue reasignado a ${nuevoUsr}.`, 'success');
+                cancelReasigSelection();
+            }
+        }
+
+
+        /* ====================================================
+           SECTION 5: FORMATOS DE ACTA Y GENERACIÓN DE ACTAS LOGIC
+        ==================================================== */
+        function renderFormatTemplatesList() {
+            const container = document.getElementById('formatTemplatesList');
+            container.innerHTML = templates.map(t => `
+                <div onclick="editTemplate('${t.id}')" class="p-3 border rounded-lg hover:border-olive-500 cursor-pointer transition flex items-center justify-between ${t.isDefault ? 'bg-olive-100/70 border-olive-400' : 'bg-beige-50 border-beige-300'}">
+                    <div>
+                        <div class="font-bold text-xs text-olive-950">${t.nombre}</div>
+                        <div class="text-[10px] text-olive-800/70 font-mono truncate max-w-[180px]">${t.titulo}</div>
+                    </div>
+                    ${t.isDefault ? `<span class="text-[9px] bg-olive-700 text-beige-100 font-bold px-1.5 py-0.5 rounded">DEFAULT</span>` : ''}
+                </div>
+            `).join('');
+
+            const activeId = document.getElementById('tplId').value;
+            if (activeId && templates.some(t => t.id === activeId)) {
+                editTemplate(activeId);
+            } else if (templates.length > 0) {
+                editTemplate(templates[0].id);
+            }
+        }
+
+        function createNewFormatTemplate() {
+            const newId = 'tpl-' + Date.now();
+            const newTpl = {
+                id: newId,
+                nombre: 'Nuevo Formato de Acta',
+                encabezado: 'POLICÍA NACIONAL DEL PERÚ - DIVISIÓN PATRIMONIAL',
+                titulo: 'ACTA DE ENTREGA Y RECEPCIÓN',
+                clausula1: 'El receptor asume la custodia del bien patrimonial asignado.',
+                clausula2: 'El bien patrimonial es entregado en condiciones óptimas de operabilidad.',
+                firmaEntregante: 'ENTREGUÉ CONFORME',
+                firmaReceptor: 'RECIBÍ CONFORME',
+                isDefault: false
+            };
+
+            templates.push(newTpl);
+            syncTemplateToCloud(newTpl);
+            renderFormatTemplatesList();
+            editTemplate(newId);
+            showToast("Nuevo formato creado. Puede editar sus cláusulas.", "success");
+        }
+
+        function editTemplate(id) {
+            const t = templates.find(item => item.id === id);
+            if (!t) return;
+
+            document.getElementById('tplId').value = t.id;
+            document.getElementById('tplNombre').value = t.nombre;
+            document.getElementById('tplEncabezado').value = t.encabezado;
+            document.getElementById('tplTitulo').value = t.titulo;
+            document.getElementById('tplClausula1').value = t.clausula1;
+            document.getElementById('tplClausula2').value = t.clausula2;
+            document.getElementById('tplFirmaEntregante').value = t.firmaEntregante;
+            document.getElementById('tplFirmaReceptor').value = t.firmaReceptor;
+
+            if (t.isDefault) {
+                document.getElementById('tplBadgeDefault').classList.remove('hidden');
+            } else {
+                document.getElementById('tplBadgeDefault').classList.add('hidden');
+            }
+        }
+
+        function handleSaveTemplate(e) {
+            e.preventDefault();
+            const id = document.getElementById('tplId').value;
+            const t = templates.find(item => item.id === id);
+
+            if (t) {
+                t.nombre = document.getElementById('tplNombre').value.trim();
+                t.encabezado = document.getElementById('tplEncabezado').value.trim().toUpperCase();
+                t.titulo = document.getElementById('tplTitulo').value.trim().toUpperCase();
+                t.clausula1 = document.getElementById('tplClausula1').value.trim();
+                t.clausula2 = document.getElementById('tplClausula2').value.trim();
+                t.firmaEntregante = document.getElementById('tplFirmaEntregante').value.trim().toUpperCase();
+                t.firmaReceptor = document.getElementById('tplFirmaReceptor').value.trim().toUpperCase();
+
+                syncTemplateToCloud(t);
+                renderFormatTemplatesList();
+                showToast("Formato de acta guardado correctamente.", "success");
+            }
+        }
+
+        function setAsDefaultTemplate() {
+            const id = document.getElementById('tplId').value;
+            templates.forEach(t => {
+                t.isDefault = (t.id === id);
+                syncTemplateToCloud(t);
+            });
+            renderFormatTemplatesList();
+            showToast("Formato establecido como predeterminado.", "success");
+        }
+
+        function populateReportesDropdowns() {
+            const histSelect = document.getElementById('historialSelectBien');
+            histSelect.innerHTML = `<option value="">-- Seleccione un bien registrado --</option>` +
+                assets.map(a => `<option value="${a.id}">${a.codigoPNP} - ${a.descripcion} (${a.esBaja ? 'DADO DE BAJA' : 'ACTIVO'})</option>`).join('');
+
+            const actaSelect = document.getElementById('actaSelectBien');
+            actaSelect.innerHTML = `<option value="">-- Seleccione el bien patrimonial --</option>` +
+                assets.filter(a => !a.esBaja).map(a => `<option value="${a.id}">${a.codigoPNP} - ${a.descripcion}</option>`).join('');
+
+            const formatSelect = document.getElementById('actaSelectFormato');
+            formatSelect.innerHTML = templates.map(t => 
+                `<option value="${t.id}" ${t.isDefault ? 'selected' : ''}>${t.nombre} ${t.isDefault ? '(Predeterminado)' : ''}</option>`
+            ).join('');
+
+            document.getElementById('actaFecha').value = new Date().toISOString().split('T')[0];
+        }
+
+        function renderHistorialTimeline() {
+            const id = document.getElementById('historialSelectBien').value;
+            const container = document.getElementById('historialTimelineContainer');
+
+            if (!id) {
+                container.innerHTML = `<p class="text-sm text-olive-800/60 text-center py-6">Seleccione un bien patrimonial de la lista superior para desplegar su hoja de vida y auditoría de eventos.</p>`;
+                return;
+            }
+
+            const asset = assets.find(a => a.id === id);
+            if (!asset) return;
+
+            let html = `
+                <div class="border-b border-beige-300 pb-4 mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                    <div>
+                        <span class="font-mono font-bold text-olive-950 bg-olive-100 border border-olive-300 px-2.5 py-1 rounded text-sm">${asset.codigoPNP}</span>
+                        <h3 class="text-lg font-bold text-olive-950 mt-1">${asset.descripcion}</h3>
+                        <p class="text-xs text-olive-800/80">Marca: ${asset.marca} | Modelo: ${asset.modelo} | Serie: ${asset.serie} | Sección: ${asset.seccion}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${asset.esBaja ? 
+                            `<span class="bg-rose-100 text-rose-900 border border-rose-300 px-3 py-1 rounded-full font-bold text-xs">DADO DE BAJA</span>` : 
+                            `<span class="bg-olive-100 text-olive-900 border border-olive-300 px-3 py-1 rounded-full font-bold text-xs">ACTIVO</span>`}
+                        <button onclick="printHistorialAsset('${asset.id}')" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-bold px-3.5 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow transition">
+                            <i class="fa-solid fa-print"></i> Imprimir Historial
+                        </button>
+                    </div>
+                </div>
+
+                <h4 class="text-xs font-bold text-olive-800 uppercase tracking-wider mb-4">Línea de Tiempo del Bien (Historial Auditado):</h4>
+                <div class="relative pl-6 border-l-2 border-beige-300 space-y-6">
+            `;
+
+            html += asset.historial.map(h => {
+                let badgeColor = 'bg-olive-700';
+                let icon = 'fa-clock';
+
+                if (h.tipo === 'Registro') { badgeColor = 'bg-olive-600'; icon = 'fa-plus'; }
+                if (h.tipo === 'Verificación') { badgeColor = 'bg-olive-800'; icon = 'fa-check'; }
+                if (h.tipo === 'Reasignación') { badgeColor = 'bg-beige-600'; icon = 'fa-arrows-rotate'; }
+                if (h.tipo === 'Baja') { badgeColor = 'bg-rose-700'; icon = 'fa-box-archive'; }
+
+                return `
+                    <div class="relative">
+                        <div class="absolute -left-[31px] top-0 w-6 h-6 rounded-full ${badgeColor} text-white flex items-center justify-center text-[10px]">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div class="bg-beige-50 p-4 rounded-lg border border-beige-300">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-xs text-olive-950 uppercase">${h.tipo}</span>
+                                <span class="text-[11px] font-mono text-olive-800/80">${h.fecha}</span>
+                            </div>
+                            <p class="text-xs text-olive-900">${h.detalle}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function autoFillActaDetails() {
+            const id = document.getElementById('actaSelectBien').value;
+            const asset = assets.find(a => a.id === id);
+
+            if (asset) {
+                document.getElementById('actaSeccion').value = asset.seccion;
+                document.getElementById('actaUsuario').value = asset.usuario;
+            }
+        }
+
+        function handleGenerarActaPreview(e) {
+            e.preventDefault();
+
+            const assetId = document.getElementById('actaSelectBien').value;
+            const asset = assets.find(a => a.id === assetId);
+
+            if (!asset) {
+                showToast("Por favor seleccione un bien patrimonial válido.", "error");
+                return;
+            }
+
+            const formatId = document.getElementById('actaSelectFormato').value;
+            const selectedFormat = templates.find(t => t.id === formatId) || templates[0];
+
+            const fecha = document.getElementById('actaFecha').value;
+            const seccion = document.getElementById('actaSeccion').value.trim();
+            const usuarioReceptor = document.getElementById('actaUsuario').value.trim();
+            const usuarioEntregante = document.getElementById('actaEntregante').value.trim();
+            const obs = document.getElementById('actaObservaciones').value.trim();
+
+            document.getElementById('docHeaderSeccion').innerText = selectedFormat.encabezado;
+            document.getElementById('docActaTitulo').innerText = selectedFormat.titulo;
+            document.getElementById('docActaNumero').innerText = `00${Math.floor(Math.random()*900 + 100)}-2026-PNP/LOG`;
+            
+            const dateObj = new Date(fecha + 'T00:00:00');
+            const dayStr = dateObj.getDate();
+            const monthStr = dateObj.toLocaleString('es-PE', { month: 'long' });
+            document.getElementById('docFechaTexto').innerText = `${dayStr} días del mes de ${monthStr} del año 2026`;
+
+            document.getElementById('docEntreganteNombre').innerText = usuarioEntregante.toUpperCase();
+            document.getElementById('docReceptorNombre').innerText = usuarioReceptor.toUpperCase();
+            document.getElementById('docSeccionNombre').innerText = seccion.toUpperCase();
+
+            document.getElementById('docCode').innerText = asset.codigoPNP;
+            document.getElementById('docDesc').innerText = asset.descripcion;
+            document.getElementById('docMarca').innerText = asset.marca;
+            document.getElementById('docModelo').innerText = asset.modelo;
+            document.getElementById('docSerie').innerText = asset.serie;
+            document.getElementById('docEstado').innerText = asset.estado.toUpperCase();
+
+            document.getElementById('docClausula1Texto').innerText = selectedFormat.clausula1;
+            document.getElementById('docClausula2Texto').innerText = selectedFormat.clausula2;
+            document.getElementById('docObservacionesTexto').innerText = obs || 'Sin observaciones adicionales.';
+
+            document.getElementById('docSigEntregante').innerText = usuarioEntregante.toUpperCase();
+            document.getElementById('docLabelEntregante').innerText = selectedFormat.firmaEntregante;
+            
+            document.getElementById('docSigReceptor').innerText = usuarioReceptor.toUpperCase();
+            document.getElementById('docLabelReceptor').innerText = selectedFormat.firmaReceptor;
+
+            document.getElementById('modalActaPreview').classList.remove('hidden');
+        }
+
+
+        /* ====================================================
+           CAMERA QR SCANNER MODAL & SIMULATION
+        ==================================================== */
+        function openQRScannerModal(context) {
+            currentQRScanContext = context;
+            document.getElementById('modalQRScanner').classList.remove('hidden');
+
+            const select = document.getElementById('simulatedQRSelect');
+            const activeAssets = assets.filter(a => !a.esBaja);
+            
+            if (activeAssets.length === 0) {
+                select.innerHTML = `<option value="">-- No hay bienes activos --</option>`;
+            } else {
+                select.innerHTML = activeAssets.map(a => `<option value="${a.codigoPNP}">${a.codigoPNP} - ${a.descripcion}</option>`).join('');
+            }
+
+            try {
+                if (!html5QrcodeScanner) {
+                    html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
+                }
+                html5QrcodeScanner.render((decodedText) => {
+                    handleScannedQRCodeText(decodedText);
+                    closeQRScannerModal();
+                }, (error) => {
+                    // ignore scan failure
+                });
+            } catch(e) {
+                console.log("Scanner init fallback:", e);
+            }
+        }
+
+        function closeQRScannerModal() {
+            if (html5QrcodeScanner) {
+                try {
+                    html5QrcodeScanner.clear();
+                } catch(e) {}
+            }
+            document.getElementById('modalQRScanner').classList.add('hidden');
+        }
+
+        function executeSimulatedQRScan() {
+            const code = document.getElementById('simulatedQRSelect').value;
+            if (code) {
+                handleScannedQRCodeText(`PNP-PATRIMONIO|CODIGO:${code}`);
+                closeQRScannerModal();
+            }
+        }
+
+        function handleScannedQRCodeText(text) {
+            let extractedCode = text;
+            if (text.includes('CODIGO:')) {
+                const parts = text.split('|');
+                const codePart = parts.find(p => p.startsWith('CODIGO:'));
+                if (codePart) extractedCode = codePart.replace('CODIGO:', '');
+            }
+
+            const asset = assets.find(a => a.codigoPNP === extractedCode);
+
+            if (!asset) {
+                showToast(`Código QR no reconocido en la base de datos: ${extractedCode}`, 'error');
+                return;
+            }
+
+            showToast(`QR Escaneado: ${asset.codigoPNP}`, 'success');
+
+            if (currentQRScanContext === 'verificar') {
+                openVerificationModal(asset.id);
+            } else if (currentQRScanContext === 'baja') {
+                selectAssetForBajaOrReasig('baja', asset.id);
+            } else if (currentQRScanContext === 'reasignar' || currentQRScanContext === 'reasig') {
+                selectAssetForBajaOrReasig('reasig', asset.id);
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
