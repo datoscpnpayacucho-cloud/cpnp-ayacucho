@@ -639,7 +639,7 @@
                         <i class="fa-solid fa-file-contract text-olive-700"></i>
                         Reportes, Formatos e Historial de Actas
                     </h2>
-                    <p class="text-sm text-olive-800/70">Cree plantillas de formato personalizadas, consulte trazabilidad y elabore Actas Oficiales.</p>
+                    <p class="text-sm text-olive-800/70">Cree plantillas de formato personalizadas, consulte trazabilidad, imprima el listado general ordenado y elabore Actas Oficiales.</p>
                 </div>
 
                 <!-- Sub-tabs nav -->
@@ -652,6 +652,9 @@
                     </button>
                     <button onclick="switchReportTab('acta')" id="subnav-acta" class="report-subnav-btn font-semibold text-sm pb-2 border-b-2 border-transparent text-olive-800/70 hover:text-olive-950">
                         <i class="fa-solid fa-file-signature mr-1.5"></i> Generar Acta de Entrega y Recepción
+                    </button>
+                    <button onclick="switchReportTab('listado')" id="subnav-listado" class="report-subnav-btn font-semibold text-sm pb-2 border-b-2 border-transparent text-olive-800/70 hover:text-olive-950">
+                        <i class="fa-solid fa-print mr-1.5"></i> Imprimir Listado Ordenado
                     </button>
                 </div>
 
@@ -806,6 +809,83 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- SUBTAB 4: IMPRIMIR LISTADO COMPLETO Y ORDENADO -->
+                <div id="subtab-listado-content" class="hidden space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-beige-300 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-beige-200 pb-3">
+                            <div>
+                                <h3 class="font-bold text-olive-950 text-sm uppercase flex items-center gap-2">
+                                    <i class="fa-solid fa-list-check text-olive-700"></i> Inventario General y Listado de Bienes
+                                </h3>
+                                <p class="text-xs text-olive-800/70 mt-0.5">Ordene los bienes patrimoniales e imprima el reporte oficial completo.</p>
+                            </div>
+                            <button onclick="printListadoCompleto()" class="bg-olive-900 hover:bg-olive-950 text-beige-200 font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-2 shadow transition">
+                                <i class="fa-solid fa-print"></i> Imprimir Listado Completo
+                            </button>
+                        </div>
+
+                        <!-- Sort & Filter Controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-beige-50/70 p-4 rounded-lg border border-beige-300">
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Ordenar por *</label>
+                                <select id="sortListadoCriterio" onchange="renderListadoCompleto()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                    <option value="codigoPNP">Código PNP</option>
+                                    <option value="descripcion">Descripción</option>
+                                    <option value="seccion">Sección / Dependencia</option>
+                                    <option value="usuario">Usuario Responsable</option>
+                                    <option value="estado">Estado Físico</option>
+                                    <option value="fechaIngreso">Fecha de Ingreso</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Dirección de Orden *</label>
+                                <select id="sortListadoDireccion" onchange="renderListadoCompleto()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                    <option value="asc">Ascendente (A - Z / Antiguo a Nuevo)</option>
+                                    <option value="desc">Descendente (Z - A / Nuevo a Antiguo)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-olive-900 uppercase mb-1">Filtro de Condición *</label>
+                                <select id="sortListadoFiltro" onchange="renderListadoCompleto()" class="w-full px-3 py-2 border border-beige-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-olive-600 focus:outline-none">
+                                    <option value="todos">Todos los bienes (Activos y Bajas)</option>
+                                    <option value="activos" selected>Solo Bienes Activos</option>
+                                    <option value="bajas">Solo Bienes Dados de Baja</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Preview of Ordered Goods -->
+                    <div class="bg-white rounded-xl shadow-sm border border-beige-300 overflow-hidden">
+                        <div class="px-6 py-4 border-b border-beige-200 bg-beige-50/70 flex justify-between items-center">
+                            <h3 class="font-semibold text-olive-950 text-sm">Vista Previa del Listado a Imprimir</h3>
+                            <span id="listadoResultCount" class="text-xs bg-beige-200 text-olive-900 px-2.5 py-1 rounded-full font-medium">0 bienes</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-beige-100/90 text-[11px] font-bold uppercase text-olive-800 border-b border-beige-300">
+                                        <th class="py-3 px-4">#</th>
+                                        <th class="py-3 px-4">Código PNP</th>
+                                        <th class="py-3 px-4">Descripción del Bien</th>
+                                        <th class="py-3 px-4">Marca / Modelo / Serie</th>
+                                        <th class="py-3 px-4">Sección</th>
+                                        <th class="py-3 px-4">Usuario Responsable</th>
+                                        <th class="py-3 px-4">Estado</th>
+                                        <th class="py-3 px-4">F. Ingreso</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableListadoCompletoBody" class="divide-y divide-beige-200 text-sm">
+                                    <!-- Dynamic list items -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1787,6 +1867,8 @@
             document.getElementById(`subtab-historial-content`).classList.add('hidden');
             document.getElementById(`subtab-formatos-content`).classList.add('hidden');
             document.getElementById(`subtab-acta-content`).classList.add('hidden');
+            const subtabListado = document.getElementById(`subtab-listado-content`);
+            if (subtabListado) subtabListado.classList.add('hidden');
 
             document.getElementById(`subnav-${subId}`).classList.add('border-olive-700', 'text-olive-900');
             document.getElementById(`subnav-${subId}`).classList.remove('border-transparent', 'text-olive-800/70');
@@ -1795,6 +1877,7 @@
             if (subId === 'historial') renderHistorialTimeline();
             if (subId === 'formatos') renderFormatTemplatesList();
             if (subId === 'acta') populateReportesDropdowns();
+            if (subId === 'listado') renderListadoCompleto();
         }
 
         // Mobile Sidebar Toggles
@@ -2429,7 +2512,7 @@
 
 
         /* ====================================================
-           SECTION 5: FORMATOS DE ACTA Y GENERACIÓN DE ACTAS LOGIC
+           SECTION 5: FORMATOS DE ACTA, GENERACIÓN Y LISTADO COMPLETO
         ==================================================== */
         function renderFormatTemplatesList() {
             const container = document.getElementById('formatTemplatesList');
@@ -2537,6 +2620,10 @@
             ).join('');
 
             document.getElementById('actaFecha').value = new Date().toISOString().split('T')[0];
+
+            if (typeof renderListadoCompleto === 'function') {
+                renderListadoCompleto();
+            }
         }
 
         function renderHistorialTimeline() {
@@ -2662,6 +2749,157 @@
             document.getElementById('docLabelReceptor').innerText = selectedFormat.firmaReceptor;
 
             document.getElementById('modalActaPreview').classList.remove('hidden');
+        }
+
+        /* Helper: Funciones para ordenar e imprimir el listado general */
+        function getSortedAssetsList() {
+            const criterio = document.getElementById('sortListadoCriterio')?.value || 'codigoPNP';
+            const direccion = document.getElementById('sortListadoDireccion')?.value || 'asc';
+            const filtro = document.getElementById('sortListadoFiltro')?.value || 'activos';
+
+            let list = [...assets];
+
+            if (filtro === 'activos') {
+                list = list.filter(a => !a.esBaja);
+            } else if (filtro === 'bajas') {
+                list = list.filter(a => a.esBaja);
+            }
+
+            list.sort((a, b) => {
+                let valA = (a[criterio] || '').toString().toLowerCase();
+                let valB = (b[criterio] || '').toString().toLowerCase();
+
+                if (criterio === 'fechaIngreso') {
+                    valA = a.fechaIngreso || a.fechaRegistro || '';
+                    valB = b.fechaIngreso || b.fechaRegistro || '';
+                }
+
+                if (valA < valB) return direccion === 'asc' ? -1 : 1;
+                if (valA > valB) return direccion === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            return list;
+        }
+
+        function renderListadoCompleto() {
+            const tbody = document.getElementById('tableListadoCompletoBody');
+            if (!tbody) return;
+
+            const list = getSortedAssetsList();
+            const countEl = document.getElementById('listadoResultCount');
+            if (countEl) countEl.innerText = `${list.length} bienes`;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-olive-800/60">No hay bienes que coincidan con los criterios seleccionados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((a, idx) => `
+                <tr class="hover:bg-beige-50 transition ${a.esBaja ? 'bg-beige-100/60 opacity-75' : ''}">
+                    <td class="py-3 px-4 font-mono text-xs text-olive-600 font-semibold">${idx + 1}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-olive-950">${a.codigoPNP}</td>
+                    <td class="py-3 px-4 font-medium text-olive-900 max-w-xs truncate" title="${a.descripcion}">${a.descripcion}</td>
+                    <td class="py-3 px-4 text-xs text-olive-800">${a.marca} / ${a.modelo} / <span class="font-mono">${a.serie}</span></td>
+                    <td class="py-3 px-4 text-xs text-olive-800">${a.seccion}</td>
+                    <td class="py-3 px-4 text-xs text-olive-900 font-medium">${a.usuario}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${getStateBadgeClass(a.estado)}">${a.estado}</span>
+                        ${a.esBaja ? '<span class="ml-1 text-[10px] text-rose-700 font-bold">(BAJA)</span>' : ''}
+                    </td>
+                    <td class="py-3 px-4 text-xs font-mono text-olive-800/80">${a.fechaIngreso || a.fechaRegistro || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function printListadoCompleto() {
+            const list = getSortedAssetsList();
+            if (list.length === 0) {
+                showToast("No hay bienes en la lista para imprimir.", "error");
+                return;
+            }
+
+            showToast("Generando reporte de listado completo...", "info");
+
+            const criterioObj = {
+                codigoPNP: 'CÓDIGO PNP',
+                descripcion: 'DESCRIPCIÓN',
+                seccion: 'SECCIÓN',
+                usuario: 'USUARIO RESPONSABLE',
+                estado: 'ESTADO FÍSICO',
+                fechaIngreso: 'FECHA DE INGRESO'
+            };
+
+            const criterio = document.getElementById('sortListadoCriterio')?.value || 'codigoPNP';
+            const direccion = document.getElementById('sortListadoDireccion')?.value || 'asc';
+            const filtro = document.getElementById('sortListadoFiltro')?.value || 'activos';
+
+            const criterioNombre = criterioObj[criterio] || 'CÓDIGO PNP';
+            const direccionNombre = direccion === 'asc' ? 'ASCENDENTE' : 'DESCENDENTE';
+            const filtroNombre = filtro === 'activos' ? 'SOLO BIENES ACTIVOS' : (filtro === 'bajas' ? 'SOLO BIENES DADOS DE BAJA' : 'TODOS LOS BIENES');
+
+            const nowStr = new Date().toLocaleDateString('es-PE') + ' ' + new Date().toLocaleTimeString('es-PE');
+
+            let rows = list.map((a, idx) => `
+                <tr style="border-bottom: 1px solid #d4c4aa; font-size: 10px;">
+                    <td style="padding: 6px; font-family: monospace; text-align: center; font-weight: bold;">${idx + 1}</td>
+                    <td style="padding: 6px; font-family: monospace; font-weight: bold; color: #161f12;">${a.codigoPNP}</td>
+                    <td style="padding: 6px; font-weight: 600; text-transform: uppercase;">${a.descripcion}</td>
+                    <td style="padding: 6px; text-transform: uppercase;">${a.marca} / ${a.modelo} / <span style="font-family: monospace;">${a.serie}</span></td>
+                    <td style="padding: 6px;">${a.seccion}</td>
+                    <td style="padding: 6px; font-weight: 500;">${a.usuario}</td>
+                    <td style="padding: 6px; font-weight: bold; text-align: center;">${a.estado} ${a.esBaja ? '(BAJA)' : ''}</td>
+                    <td style="padding: 6px; font-family: monospace; text-align: center;">${a.fechaIngreso || a.fechaRegistro || '-'}</td>
+                </tr>
+            `).join('');
+
+            const htmlContent = `
+                <div style="padding: 1.5rem; color: #161f12; font-family: sans-serif; background: white;">
+                    <div style="text-align: center; border-bottom: 2px solid #2a3722; padding-bottom: 10px; margin-bottom: 16px;">
+                        <h2 style="font-size: 16px; font-weight: 800; text-transform: uppercase; margin: 0;">POLICÍA NACIONAL DEL PERÚ</h2>
+                        <h3 style="font-size: 12px; font-weight: 600; color: #3d5330; margin: 4px 0 0 0; text-transform: uppercase;">COMISARÍA PNP AYACUCHO - CONTROL PATRIMONIAL</h3>
+                        <h1 style="font-size: 14px; font-weight: 800; color: #161f12; margin: 10px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px; text-decoration: underline;">REPORTES PATRIMONIALES: INVENTARIO GENERAL DE BIENES</h1>
+                    </div>
+
+                    <div style="background: #faf8f4; border: 1px solid #d4c4aa; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; font-size: 11px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <div><strong>Criterio de Ordenamiento:</strong> ${criterioNombre} (${direccionNombre})</div>
+                        <div><strong>Filtro Aplicado:</strong> ${filtroNombre}</div>
+                        <div><strong>Total de Bienes Listados:</strong> <span style="font-weight: bold; font-family: monospace;">${list.length}</span></div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 24px;">
+                        <thead>
+                            <tr style="background: #e4eadb; border-bottom: 2px solid #2a3722; font-size: 10px; text-transform: uppercase;">
+                                <th style="padding: 6px; text-align: center; width: 30px;">#</th>
+                                <th style="padding: 6px; width: 100px;">Código PNP</th>
+                                <th style="padding: 6px;">Descripción del Bien</th>
+                                <th style="padding: 6px; width: 160px;">Marca / Modelo / Serie</th>
+                                <th style="padding: 6px; width: 120px;">Sección</th>
+                                <th style="padding: 6px; width: 130px;">Usuario Responsable</th>
+                                <th style="padding: 6px; text-align: center; width: 75px;">Estado</th>
+                                <th style="padding: 6px; text-align: center; width: 80px;">F. Ingreso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; color: #4f3d29; border-top: 1px solid #d4c4aa; padding-top: 12px;">
+                        <div>
+                            <p style="margin: 0;"><strong>Emisión:</strong> ${nowStr}</p>
+                            <p style="margin: 2px 0 0 0;">Sistema Institucional de Control y Gestión de Bienes Patrimoniales PNP</p>
+                        </div>
+                        <div style="text-align: center; min-width: 200px;">
+                            <div style="border-top: 1px solid #161f12; margin-bottom: 4px; width: 100%;"></div>
+                            <p style="margin: 0; font-weight: bold; text-transform: uppercase;">RESPONSABLE DE PATRIMONIO LOGÍSTICO</p>
+                            <p style="margin: 0; font-size: 9px; color: #745d3c;">FIRMA Y SELLO OFICIAL</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            executePrintHTML(htmlContent);
         }
 
 
