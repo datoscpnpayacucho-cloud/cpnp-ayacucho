@@ -85,15 +85,16 @@
       text-transform: uppercase;
     }
     .official-section-banner {
-      background-color: #e6efe9;
+      background-color: #ffffff !important;
       border: 0.25pt solid #1f2937;
       border-bottom: none;
       font-weight: 800;
-      font-size: 5.5pt;
-      padding: 2px 4px;
+      font-size: 15pt !important;
+      padding: 4px 6px;
+      line-height: 1.2;
       text-transform: uppercase;
       text-align: center;
-      color: #063724;
+      color: #000000 !important;
     }
 
     /* Compact 5pt Typography & Thin Lines for Rol de Servicio Preview & Print */
@@ -114,19 +115,23 @@
       vertical-align: middle !important;
     }
     .official-document-wrapper .official-section-banner {
+      background-color: #ffffff !important;
+      color: #000000 !important;
       border: 0.25pt solid #1f2937;
       border-bottom: none;
-      font-size: 5.5pt;
-      padding: 1.5px 3px;
-      line-height: 1.1;
+      font-size: 15pt !important;
+      font-weight: 800;
+      padding: 4px 6px;
+      line-height: 1.2;
       text-align: center;
+      text-transform: uppercase;
     }
 
     /* Rancho Preview & Print Table Rules */
     .rancho-table {
       border-collapse: collapse;
-      width: auto;
-      max-width: 100%;
+      width: 100% !important;
+      max-width: 100% !important;
       table-layout: auto;
       margin: 0 auto;
     }
@@ -134,6 +139,8 @@
     .rancho-table tbody td {
       box-sizing: border-box;
       vertical-align: middle !important;
+      font-size: 12pt !important;
+      line-height: 1.2;
     }
 
     /* Print Media Styles (@media print) */
@@ -284,20 +291,26 @@
             </button>
 
             <button type="button" onclick="openRanchoModal()"
-              class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-[#063724]/80 hover:bg-[#063724] text-white border border-[#D4AF37]/40 text-xs sm:text-[13px] leading-5 font-medium whitespace-nowrap transition shadow-sm cursor-pointer">
+              class="inline-flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-lg bg-[#063724]/80 hover:bg-[#063724] text-white border border-[#D4AF37]/40 text-xs sm:text-[13px] font-medium whitespace-nowrap transition shadow-sm cursor-pointer">
               <i data-lucide="utensils" class="w-4 h-4 text-[#D4AF37] shrink-0"></i>
               <span>Rancho</span>
             </button>
 
             <div class="inline-flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button type="button" onclick="openPreviewModal()"
-                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-[13px] leading-5 font-semibold whitespace-nowrap transition shadow-sm cursor-pointer">
+                class="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-[13px] font-semibold whitespace-nowrap transition shadow-sm cursor-pointer">
                 <i data-lucide="eye" class="w-4 h-4 text-[#D4AF37] shrink-0"></i>
                 <span>Vista Previa</span>
               </button>
 
+              <button type="button" onclick="openSaveRoleConfirmModal()"
+                class="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#D4AF37] hover:bg-[#e5c147] text-[#063724] border border-[#F3E5AB] text-xs sm:text-[13px] font-extrabold whitespace-nowrap transition shadow-md cursor-pointer">
+                <i data-lucide="save" class="w-4 h-4 shrink-0"></i>
+                <span>Grabar Rol</span>
+              </button>
+
               <button type="button" onclick="triggerOfficialPrint()"
-                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-emerald-50 text-[#063724] border border-[#D4AF37] font-bold text-xs sm:text-[13px] leading-5 whitespace-nowrap transition shadow-md cursor-pointer">
+                class="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-white hover:bg-emerald-50 text-[#063724] border border-[#D4AF37] font-bold text-xs sm:text-[13px] whitespace-nowrap transition shadow-md cursor-pointer">
                 <i data-lucide="printer" class="w-4 h-4 shrink-0"></i>
                 <span>Imprimir Rol</span>
               </button>
@@ -319,16 +332,6 @@
                 <i data-lucide="calendar" class="w-4 h-4 text-[#0B5338]"></i>
                 Fecha del Servicio
               </label>
-              <span id="save-status-badge" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                <i data-lucide="check-circle-2" class="w-3 h-3"></i>
-                Guardado Automático
-              </span>
-              <button type="button" id="cloud-status-btn" onclick="openCloudStatusModal()"
-                class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400 transition cursor-pointer"
-                title="Estado de la sincronización en la nube Firebase">
-                <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#0B5338]"></i>
-                <span id="cloud-status-text">Conectando Nube...</span>
-              </button>
             </div>
             <p id="formatted-date-display" class="text-xs sm:text-sm font-medium text-gray-600 capitalize">
               Cargando fecha...
@@ -490,6 +493,22 @@
         </div>
       </div>
     </footer>
+
+    <!-- Bottom Status Bar (Al final por debajo de todo) -->
+    <div class="bg-[#042619] text-emerald-100 py-2 px-4 border-t border-emerald-900/70">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center sm:justify-end gap-2">
+        <span id="save-status-badge" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-100 bg-white/10 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
+          <i data-lucide="check-circle-2" class="w-3 h-3 text-[#D4AF37]"></i>
+          Guardado Automático
+        </span>
+        <button type="button" id="cloud-status-btn" onclick="openCloudStatusModal()"
+          class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-950 bg-emerald-200 hover:bg-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400 transition cursor-pointer"
+          title="Estado de la sincronización en la nube Firebase">
+          <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#063724]"></i>
+          <span id="cloud-status-text">Conectando Nube...</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- ===================================================================== -->
@@ -528,199 +547,339 @@
         <form id="officer-form" onsubmit="handleSaveOfficer(event)" class="p-5 space-y-4 max-h-[85vh] overflow-y-auto">
           <input type="hidden" id="officer-id-input" />
 
-          <!-- Sección asignada -->
-          <div class="relative" data-combobox-wrapper="section">
-            <label for="officer-section-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-              Sección de Servicio *
-            </label>
-            <div class="relative flex items-center">
-              <input type="text" id="officer-section-input" required autocomplete="off"
-                onfocus="openEditableCombobox('section', false)"
-                oninput="this.value = this.value.toUpperCase(); openEditableCombobox('section', true)"
-                placeholder="Elija de la lista, edite o escriba nueva sección..."
-                class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:border-[#0B5338] focus:outline-none" />
-              <div class="absolute right-2 flex items-center gap-0.5">
-                <button type="button" onclick="clearEditableCombobox('section')"
-                  class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
-                  title="Limpiar para elegir o escribir nueva sección">
-                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </button>
-                <button type="button" onclick="toggleEditableCombobox('section')"
-                  class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
-                  title="Desplegar lista de secciones">
-                  <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                </button>
+          <!-- Bloque 1: Datos de Servicio Policial -->
+          <div class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-emerald-900/15 pb-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#0B5338]"></span>
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#063724]">Datos del Servicio Policial</h4>
+            </div>
+
+            <!-- Sección asignada -->
+            <div class="relative" data-combobox-wrapper="section">
+              <label for="officer-section-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                Sección de Servicio *
+              </label>
+              <div class="relative flex items-center">
+                <input type="text" id="officer-section-input" required autocomplete="off"
+                  onfocus="openEditableCombobox('section', false)"
+                  oninput="this.value = this.value.toUpperCase(); openEditableCombobox('section', true)"
+                  placeholder="Elija de la lista, edite o escriba nueva sección..."
+                  class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:border-[#0B5338] focus:outline-none" />
+                <div class="absolute right-2 flex items-center gap-0.5">
+                  <button type="button" onclick="clearEditableCombobox('section')"
+                    class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
+                    title="Limpiar para elegir o escribir nueva sección">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" onclick="toggleEditableCombobox('section')"
+                    class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
+                    title="Desplegar lista de secciones">
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              <div id="officer-section-dropdown"
+                class="hidden absolute left-0 right-0 z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
               </div>
             </div>
-            <div id="officer-section-dropdown"
-              class="hidden absolute left-0 right-0 z-30 mt-1 max-h-56 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <!-- Categoría PNP -->
+              <div class="sm:col-span-3">
+                <label for="officer-category-select" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Categoría PNP *
+                </label>
+                <select id="officer-category-select" required
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
+                  <option value="OFICIAL">OFICIAL</option>
+                  <option value="SUB OFICIAL" selected>SUB OFICIAL</option>
+                </select>
+              </div>
+
+              <!-- Grado -->
+              <div class="sm:col-span-3">
+                <label for="officer-rank-select" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Grado PNP *
+                </label>
+                <select id="officer-rank-select" required onchange="handleRankChangeForCategory(this.value)"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
+                  <optgroup label="Oficiales PNP">
+                    <option value="GRAL. PNP">GRAL. PNP</option>
+                    <option value="CRNL. PNP">CRNL. PNP</option>
+                    <option value="CMDTE. PNP">CMDTE. PNP</option>
+                    <option value="MAY. PNP">MAY. PNP</option>
+                    <option value="CAP. PNP">CAP. PNP</option>
+                    <option value="TNTE. PNP">TNTE. PNP</option>
+                    <option value="ALFZ. PNP">ALFZ. PNP</option>
+                  </optgroup>
+                  <optgroup label="Suboficiales PNP">
+                    <option value="SS. PNP">SS. PNP</option>
+                    <option value="SB. PNP">SB. PNP</option>
+                    <option value="ST1. PNP">ST1. PNP</option>
+                    <option value="ST2. PNP">ST2. PNP</option>
+                    <option value="ST3. PNP">ST3. PNP</option>
+                    <option value="S1. PNP">S1. PNP</option>
+                    <option value="S2. PNP">S2. PNP</option>
+                    <option value="S3. PNP" selected>S3. PNP</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- Apellidos y Nombres -->
+              <div class="sm:col-span-6">
+                <label for="officer-name-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Apellidos y Nombres (En Mayúsculas) *
+                </label>
+                <input type="text" id="officer-name-input" required
+                  oninput="this.value = this.value.toUpperCase()"
+                  placeholder="EJ: PEREZ GOMEZ JUAN CARLOS"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold uppercase text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Cargo -->
+              <div class="relative" data-combobox-wrapper="cargo">
+                <label for="officer-cargo-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Cargo *
+                </label>
+                <div class="relative flex items-center">
+                  <input type="text" id="officer-cargo-input" required autocomplete="off"
+                    onfocus="openEditableCombobox('cargo', false)"
+                    oninput="this.value = this.value.toUpperCase(); openEditableCombobox('cargo', true)"
+                    placeholder="Elija, edite o escriba nuevo cargo..."
+                    class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+                  <div class="absolute right-2 flex items-center gap-0.5">
+                    <button type="button" onclick="clearEditableCombobox('cargo')"
+                      class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
+                      title="Limpiar para elegir o escribir nuevo cargo">
+                      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" onclick="toggleEditableCombobox('cargo')"
+                      class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
+                      title="Desplegar lista de cargos">
+                      <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+                <div id="officer-cargo-dropdown"
+                  class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
+                </div>
+              </div>
+
+              <!-- Horario -->
+              <div class="relative" data-combobox-wrapper="horario">
+                <label for="officer-horario-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Horario *
+                </label>
+                <div class="relative flex items-center">
+                  <input type="text" id="officer-horario-input" required autocomplete="off"
+                    onfocus="openEditableCombobox('horario', false)"
+                    oninput="this.value = this.value.toUpperCase(); openEditableCombobox('horario', true)"
+                    placeholder="Elija, edite o escriba nuevo horario..."
+                    class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+                  <div class="absolute right-2 flex items-center gap-0.5">
+                    <button type="button" onclick="clearEditableCombobox('horario')"
+                      class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
+                      title="Limpiar para elegir o escribir nuevo horario">
+                      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" onclick="toggleEditableCombobox('horario')"
+                      class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
+                      title="Desplegar lista de horarios">
+                      <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+                <div id="officer-horario-dropdown"
+                  class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+              <!-- Aptitud -->
+              <div class="sm:col-span-5 relative" data-combobox-wrapper="aptitud">
+                <label for="officer-aptitud-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Aptitud *
+                </label>
+                <div class="relative flex items-center">
+                  <input type="text" id="officer-aptitud-input" required autocomplete="off"
+                    onfocus="openEditableCombobox('aptitud', false)"
+                    oninput="this.value = this.value.toUpperCase(); openEditableCombobox('aptitud', true)"
+                    placeholder="Elija, edite o escriba aptitud..."
+                    class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+                  <div class="absolute right-2 flex items-center gap-0.5">
+                    <button type="button" onclick="clearEditableCombobox('aptitud')"
+                      class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
+                      title="Limpiar para elegir o escribir nueva aptitud">
+                      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" onclick="toggleEditableCombobox('aptitud')"
+                      class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
+                      title="Desplegar lista de aptitudes">
+                      <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+                <div id="officer-aptitud-dropdown"
+                  class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
+                </div>
+              </div>
+
+              <!-- CIP -->
+              <div class="sm:col-span-3">
+                <label for="officer-cip-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  CIP (8 Dígitos) *
+                </label>
+                <input type="text" id="officer-cip-input" required maxlength="10"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                  placeholder="EJ: 31458920"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+              </div>
+
+              <!-- Celular -->
+              <div class="sm:col-span-4">
+                <label for="officer-phone-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Celular (Opcional)
+                </label>
+                <input type="text" id="officer-phone-input" maxlength="15"
+                  oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')"
+                  placeholder="EJ: 948512364"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            <!-- Categoría PNP -->
-            <div class="sm:col-span-3">
-              <label for="officer-category-select" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Categoría PNP *
-              </label>
-              <select id="officer-category-select" required
-                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
-                <option value="OFICIAL">OFICIAL</option>
-                <option value="SUB OFICIAL" selected>SUB OFICIAL</option>
-              </select>
+          <!-- Bloque 2: Datos Personales y Licencia de Conducir -->
+          <div class="space-y-4 pt-2">
+            <div class="flex items-center gap-2 border-b border-emerald-900/15 pb-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#063724]">Datos Personales y Licencia de Conducir</h4>
             </div>
 
-            <!-- Grado -->
-            <div class="sm:col-span-3">
-              <label for="officer-rank-select" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Grado PNP *
-              </label>
-              <select id="officer-rank-select" required onchange="handleRankChangeForCategory(this.value)"
-                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
-                <optgroup label="Oficiales PNP">
-                  <option value="GRAL. PNP">GRAL. PNP</option>
-                  <option value="CRNL. PNP">CRNL. PNP</option>
-                  <option value="CMDTE. PNP">CMDTE. PNP</option>
-                  <option value="MAY. PNP">MAY. PNP</option>
-                  <option value="CAP. PNP">CAP. PNP</option>
-                  <option value="TNTE. PNP">TNTE. PNP</option>
-                  <option value="ALFZ. PNP">ALFZ. PNP</option>
-                </optgroup>
-                <optgroup label="Suboficiales PNP">
-                  <option value="SS. PNP">SS. PNP</option>
-                  <option value="SB. PNP">SB. PNP</option>
-                  <option value="ST1. PNP">ST1. PNP</option>
-                  <option value="ST2. PNP">ST2. PNP</option>
-                  <option value="ST3. PNP">ST3. PNP</option>
-                  <option value="S1. PNP">S1. PNP</option>
-                  <option value="S2. PNP">S2. PNP</option>
-                  <option value="S3. PNP" selected>S3. PNP</option>
-                </optgroup>
-              </select>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <!-- Sexo -->
+              <div>
+                <label for="officer-sexo-select" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Sexo
+                </label>
+                <select id="officer-sexo-select"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
+                  <option value="MASCULINO">MASCULINO</option>
+                  <option value="FEMENINO">FEMENINO</option>
+                </select>
+              </div>
+
+              <!-- Fecha de Nacimiento -->
+              <div>
+                <label for="officer-birth-date-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Fecha de Nacimiento
+                </label>
+                <input type="date" id="officer-birth-date-input"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+              </div>
+
+              <!-- Fecha de Ingreso a la Comisaría -->
+              <div>
+                <label for="officer-entry-date-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                  Fecha Ingreso a la Comisaría
+                </label>
+                <input type="date" id="officer-entry-date-input"
+                  class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+              </div>
             </div>
 
-            <!-- Apellidos y Nombres -->
-            <div class="sm:col-span-6">
-              <label for="officer-name-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Apellidos y Nombres (En Mayúsculas) *
+            <!-- Dirección -->
+            <div>
+              <label for="officer-address-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
+                Dirección
               </label>
-              <input type="text" id="officer-name-input" required
+              <input type="text" id="officer-address-input"
                 oninput="this.value = this.value.toUpperCase()"
-                placeholder="EJ: PEREZ GOMEZ JUAN CARLOS"
+                placeholder="EJ: JR. AYACUCHO N° 450 - TRUJILLO"
                 class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-semibold uppercase text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
             </div>
-          </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Cargo -->
-            <div class="relative" data-combobox-wrapper="cargo">
-              <label for="officer-cargo-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Cargo *
-              </label>
-              <div class="relative flex items-center">
-                <input type="text" id="officer-cargo-input" required autocomplete="off"
-                  onfocus="openEditableCombobox('cargo', false)"
-                  oninput="this.value = this.value.toUpperCase(); openEditableCombobox('cargo', true)"
-                  placeholder="Elija, edite o escriba nuevo cargo..."
-                  class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
-                <div class="absolute right-2 flex items-center gap-0.5">
-                  <button type="button" onclick="clearEditableCombobox('cargo')"
-                    class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
-                    title="Limpiar para elegir o escribir nuevo cargo">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <button type="button" onclick="toggleEditableCombobox('cargo')"
-                    class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
-                    title="Desplegar lista de cargos">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                  </button>
+            <!-- Licencia de Conducir -->
+            <div class="rounded-xl border border-emerald-900/15 bg-emerald-50/40 p-4 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <label for="officer-has-license-select" class="flex items-center gap-2 text-xs font-extrabold uppercase text-[#063724]">
+                  <i data-lucide="car" class="w-4 h-4 text-[#0B5338]"></i>
+                  <span>¿Tiene Licencia de Conducir?</span>
+                </label>
+                <select id="officer-has-license-select" onchange="toggleLicenseDetailsFields()"
+                  class="w-full sm:w-44 rounded-xl border border-gray-300 px-3 py-2 text-sm font-bold text-[#063724] bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
+                  <option value="NO" selected>NO</option>
+                  <option value="SI">SÍ</option>
+                </select>
+              </div>
+
+              <!-- Sub-formulario condicional cuando SÍ tiene licencia -->
+              <div id="officer-license-details-box" class="hidden pt-2 border-t border-emerald-900/15 space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Clase de Vehículo -->
+                  <div class="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+                    <span class="block text-[11px] font-extrabold uppercase text-[#063724]">
+                      Clase de Vehículo *
+                    </span>
+                    <div class="flex flex-wrap items-center gap-4">
+                      <label class="inline-flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer">
+                        <input type="checkbox" id="lic-veh-mayor" value="VEHÍCULO MAYOR"
+                          class="w-4 h-4 accent-[#0B5338] rounded cursor-pointer" />
+                        <span>VEHÍCULO MAYOR</span>
+                      </label>
+                      <label class="inline-flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer">
+                        <input type="checkbox" id="lic-veh-menor" value="VEHÍCULO MENOR"
+                          class="w-4 h-4 accent-[#0B5338] rounded cursor-pointer" />
+                        <span>VEHÍCULO MENOR</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Tipo de Licencia (Civil y/o Policial) -->
+                  <div class="bg-white rounded-xl border border-gray-200 p-3 space-y-2">
+                    <span class="block text-[11px] font-extrabold uppercase text-[#063724]">
+                      Tipo de Licencia (Civil y/o Policial) *
+                    </span>
+                    <div class="flex flex-wrap items-center gap-4">
+                      <label class="inline-flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer">
+                        <input type="checkbox" id="lic-tipo-civil" value="CIVIL" onchange="updateLicenseNumberInputsVisibility()"
+                          class="w-4 h-4 accent-[#0B5338] rounded cursor-pointer" />
+                        <span>CIVIL</span>
+                      </label>
+                      <label class="inline-flex items-center gap-2 text-xs font-bold text-gray-800 cursor-pointer">
+                        <input type="checkbox" id="lic-tipo-policial" value="POLICIAL" onchange="updateLicenseNumberInputsVisibility()"
+                          class="w-4 h-4 accent-[#0B5338] rounded cursor-pointer" />
+                        <span>POLICIAL</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Número(s) de Licencia -->
+                <div id="lic-numbers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div id="lic-num-civil-wrapper">
+                    <label for="officer-lic-num-civil" id="officer-lic-num-civil-label" class="block text-[11px] font-extrabold uppercase text-[#063724] mb-1">
+                      N° de Licencia *
+                    </label>
+                    <input type="text" id="officer-lic-num-civil"
+                      oninput="this.value = this.value.toUpperCase()"
+                      placeholder="EJ: Q31458920"
+                      class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm font-mono font-bold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+                  </div>
+
+                  <div id="lic-num-policial-wrapper" class="hidden">
+                    <label for="officer-lic-num-policial" class="block text-[11px] font-extrabold uppercase text-[#063724] mb-1">
+                      N° de Licencia Policial *
+                    </label>
+                    <input type="text" id="officer-lic-num-policial"
+                      oninput="this.value = this.value.toUpperCase()"
+                      placeholder="EJ: PNP-123456"
+                      class="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm font-mono font-bold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+                  </div>
                 </div>
               </div>
-              <div id="officer-cargo-dropdown"
-                class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
-              </div>
-            </div>
-
-            <!-- Horario -->
-            <div class="relative" data-combobox-wrapper="horario">
-              <label for="officer-horario-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Horario *
-              </label>
-              <div class="relative flex items-center">
-                <input type="text" id="officer-horario-input" required autocomplete="off"
-                  onfocus="openEditableCombobox('horario', false)"
-                  oninput="this.value = this.value.toUpperCase(); openEditableCombobox('horario', true)"
-                  placeholder="Elija, edite o escriba nuevo horario..."
-                  class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
-                <div class="absolute right-2 flex items-center gap-0.5">
-                  <button type="button" onclick="clearEditableCombobox('horario')"
-                    class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
-                    title="Limpiar para elegir o escribir nuevo horario">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <button type="button" onclick="toggleEditableCombobox('horario')"
-                    class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
-                    title="Desplegar lista de horarios">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-              <div id="officer-horario-dropdown"
-                class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-            <!-- Aptitud -->
-            <div class="sm:col-span-5 relative" data-combobox-wrapper="aptitud">
-              <label for="officer-aptitud-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Aptitud *
-              </label>
-              <div class="relative flex items-center">
-                <input type="text" id="officer-aptitud-input" required autocomplete="off"
-                  onfocus="openEditableCombobox('aptitud', false)"
-                  oninput="this.value = this.value.toUpperCase(); openEditableCombobox('aptitud', true)"
-                  placeholder="Elija, edite o escriba aptitud..."
-                  class="w-full rounded-xl border border-gray-300 pl-3.5 pr-16 py-2.5 text-xs sm:text-sm font-semibold uppercase text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
-                <div class="absolute right-2 flex items-center gap-0.5">
-                  <button type="button" onclick="clearEditableCombobox('aptitud')"
-                    class="p-1 rounded-lg text-gray-400 hover:text-red-600 hover:bg-gray-100 transition cursor-pointer"
-                    title="Limpiar para elegir o escribir nueva aptitud">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                  </button>
-                  <button type="button" onclick="toggleEditableCombobox('aptitud')"
-                    class="p-1 rounded-lg text-[#063724] hover:bg-emerald-50 transition cursor-pointer"
-                    title="Desplegar lista de aptitudes">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-              <div id="officer-aptitud-dropdown"
-                class="hidden absolute left-0 right-0 z-30 mt-1 max-h-52 overflow-y-auto rounded-xl border border-emerald-900/20 bg-white shadow-xl divide-y divide-gray-100">
-              </div>
-            </div>
-
-            <!-- CIP -->
-            <div class="sm:col-span-3">
-              <label for="officer-cip-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                CIP (8 Dígitos) *
-              </label>
-              <input type="text" id="officer-cip-input" required maxlength="10"
-                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                placeholder="EJ: 31458920"
-                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
-            </div>
-
-            <!-- Celular -->
-            <div class="sm:col-span-4">
-              <label for="officer-phone-input" class="block text-xs font-bold uppercase text-[#063724] mb-1">
-                Celular (Opcional)
-              </label>
-              <input type="text" id="officer-phone-input" maxlength="15"
-                oninput="this.value = this.value.replace(/[^0-9+\s-]/g, '')"
-                placeholder="EJ: 948512364"
-                class="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm font-mono font-semibold text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
             </div>
           </div>
 
@@ -982,7 +1141,7 @@
             <i data-lucide="bar-chart-3" class="w-5 h-5 text-[#D4AF37]"></i>
             <div>
               <h3 class="font-bold text-sm sm:text-base">Reportes y Consultas de Efectivos Policiales</h3>
-              <p class="text-[11px] text-emerald-200">Filtre por fecha, sección, grado, cargo, horario o aptitud (ordenado por jerarquía PNP)</p>
+              <p class="text-[11px] text-emerald-200">Filtre por fecha, sección, grado, cargo, horario, aptitud o licencia de conducir (ordenado por jerarquía PNP)</p>
             </div>
           </div>
 
@@ -1069,25 +1228,31 @@
               </select>
             </div>
 
-            <!-- Filter: Aptitud -->
+            <!-- Filter: Licencia de Conducir -->
             <div>
-              <label for="report-filter-aptitud" class="block text-[11px] font-bold uppercase text-[#063724] mb-1">
-                Aptitud
+              <label for="report-filter-license" class="block text-[11px] font-bold uppercase text-[#063724] mb-1">
+                Licencia de Conducir
               </label>
-              <select id="report-filter-aptitud" onchange="renderReportsTable()"
+              <select id="report-filter-license" onchange="renderReportsTable()"
                 class="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none">
-                <option value="ALL">TODAS LAS APTITUDES</option>
+                <option value="ALL">TODOS</option>
+                <option value="SI">CON LICENCIA (SÍ)</option>
+                <option value="NO">SIN LICENCIA (NO)</option>
+                <option value="VEHÍCULO MAYOR">VEHÍCULO MAYOR</option>
+                <option value="VEHÍCULO MENOR">VEHÍCULO MENOR</option>
+                <option value="CIVIL">LICENCIA CIVIL</option>
+                <option value="POLICIAL">LICENCIA POLICIAL</option>
               </select>
             </div>
 
             <!-- Filter: Búsqueda Rápida -->
             <div>
               <label for="report-filter-search" class="block text-[11px] font-bold uppercase text-[#063724] mb-1">
-                Buscar Nombre / CIP / Celular
+                Buscar Nombre / CIP / Licencia / Dir.
               </label>
               <div class="relative">
                 <input type="text" id="report-filter-search" oninput="renderReportsTable()"
-                  placeholder="Escriba apellidos, CIP..."
+                  placeholder="Escriba apellidos, CIP, licencia..."
                   class="w-full rounded-xl border border-gray-300 pl-3 pr-8 py-2 text-xs font-semibold text-gray-900 bg-white focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
                 <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-2.5"></i>
               </div>
@@ -1465,17 +1630,88 @@
       </div>
     </div>
 
+    <!-- 11. Modal Editar Nombre de Sección -->
+    <div id="edit-section-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/65 backdrop-blur-xs p-4 overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl border border-emerald-900/20 w-full max-w-md overflow-hidden my-auto">
+        <div class="bg-[#063724] text-white px-5 py-4 flex items-center justify-between border-b-2 border-[#D4AF37]">
+          <div class="flex items-center gap-2">
+            <i data-lucide="folder-pen" class="w-5 h-5 text-[#D4AF37]"></i>
+            <h3 class="font-bold text-base">Editar Nombre de Sección</h3>
+          </div>
+          <button type="button" onclick="closeModal('edit-section-modal')" class="text-white/80 hover:text-white p-1 rounded-lg cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form onsubmit="handleSaveSectionName(event)" class="p-5 space-y-4">
+          <input type="hidden" id="edit-section-old-name" />
+          <div>
+            <label for="edit-section-new-name" class="block text-xs font-bold uppercase text-[#063724] mb-1.5">
+              Nuevo Nombre de la Sección *
+            </label>
+            <input type="text" id="edit-section-new-name" required
+              oninput="this.value = this.value.toUpperCase()"
+              placeholder="ESCRIBA EL NOMBRE DE LA SECCIÓN"
+              class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm font-bold uppercase text-gray-900 focus:ring-2 focus:ring-[#0B5338] focus:outline-none" />
+          </div>
+
+          <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+            <button type="button" onclick="closeModal('edit-section-modal')"
+              class="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-semibold text-xs sm:text-sm hover:bg-gray-50 cursor-pointer">
+              Cancelar
+            </button>
+            <button type="submit"
+              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#0B5338] hover:bg-[#063724] text-white font-bold text-xs sm:text-sm shadow cursor-pointer">
+              <i data-lucide="check" class="w-4 h-4 text-[#D4AF37]"></i>
+              <span>Guardar Nombre</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 12. Modal Confirmación Personalizado -->
+    <div id="custom-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/65 backdrop-blur-xs p-4 overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl border border-emerald-900/20 w-full max-w-md overflow-hidden my-auto">
+        <div class="bg-[#063724] text-white px-5 py-4 flex items-center justify-between border-b-2 border-[#D4AF37]">
+          <div class="flex items-center gap-2">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-[#D4AF37]"></i>
+            <h3 id="custom-confirm-title" class="font-bold text-base">Confirmar Acción</h3>
+          </div>
+          <button type="button" onclick="closeModal('custom-confirm-modal')" class="text-white/80 hover:text-white p-1 rounded-lg cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <p id="custom-confirm-message" class="text-xs sm:text-sm text-gray-700 leading-relaxed"></p>
+
+          <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+            <button type="button" onclick="closeModal('custom-confirm-modal')"
+              class="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-semibold text-xs sm:text-sm hover:bg-gray-50 cursor-pointer">
+              Cancelar
+            </button>
+            <button type="button" id="custom-confirm-accept-btn"
+              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white font-bold text-xs sm:text-sm shadow cursor-pointer">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Toast Notifications Container -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- ===================================================================== -->
-  <!-- APPLICATION LOGIC (JAVASCRIPT + FIREBASE FIRESTORE SYNC)              -->
+  <!-- APPLICATION LOGIC & FIREBASE CLOUD SYNC                               -->
   <!-- ===================================================================== -->
   <script>
     // =========================================================================
-    // CONFIGURACIÓN DE FIREBASE INTEGRADA (rol-cpnp-ayacucho)
+    // CONFIGURACIÓN DE FIREBASE (rol-cpnp-ayacucho)
     // =========================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyDI4dYxn1PSxim2Hx7PA033UuMo2X1VoOs",
@@ -1486,36 +1722,47 @@
       appId: "1:791180537298:web:5a20f90232ce5014306c0b"
     };
 
-    // =========================================================================
-    // CONSTANTS & DEFAULTS
-    // =========================================================================
-    const STORAGE_KEY = 'pnp_ayacucho_rol_servicio_v1';
+    const STORAGE_KEY = 'cpnp_ayacucho_rol_servicio_v3';
     const FIRESTORE_COLLECTION = 'cpnp_ayacucho_sistema';
-    const FIRESTORE_DOC_ID = 'datos_principales';
+    const FIRESTORE_DOC_ID = 'rol_servicio_diario_principal';
+
+    const RANK_HIERARCHY = [
+      'GRAL. PNP', 'CRNL. PNP', 'CMDTE. PNP', 'MAY. PNP', 'CAP. PNP', 'TNTE. PNP', 'ALFZ. PNP',
+      'SS. PNP', 'SB. PNP', 'ST1. PNP', 'ST2. PNP', 'ST3. PNP', 'S1. PNP', 'S2. PNP', 'S3. PNP'
+    ];
+
+    const OFFICER_RANKS = [
+      'GRAL. PNP', 'CRNL. PNP', 'CMDTE. PNP', 'MAY. PNP', 'CAP. PNP', 'TNTE. PNP', 'ALFZ. PNP'
+    ];
 
     const DEFAULT_SECTIONS = [
       'PRINCIPAL',
-      'COMISARIO',
-      'OFICINA DE ADMINISTRACIÓN',
-      'SECCIÓN DE INVESTIGACIÓN POLICIAL',
-      'SECCIÓN DE DELITOS Y FALTAS',
-      'SECCIÓN DE TRÁNSITO',
+      'SECCIÓN DE PREVENCIÓN',
+      'SECCIÓN DE INVESTIGACIÓN CRIMINAL',
       'SECCIÓN DE FAMILIA',
-      'GUARDIA DE PREVENCIÓN Y PATRULLAJE'
+      'SECCIÓN DE TRÁNSITO',
+      'SECCIÓN DE INTELIGENCIA',
+      'OFICINA DE ADMINISTRACIÓN',
+      'SERVICIO DE GUARDIA'
     ];
 
     const DEFAULT_CARGOS = [
       'COMISARIO',
       'JEFE DE ADMINISTRACIÓN',
-      'JEFE DE SECCIÓN',
+      'JEFE DE SECCIÓN PREVENCIÓN',
+      'JEFE DE SECCIÓN INVESTIGACIÓN CRIMINAL',
+      'JEFE DE SECCIÓN FAMILIA',
+      'JEFE DE SECCIÓN TRÁNSITO',
       'OFICIAL DE GUARDIA',
       'COMANDANTE DE GUARDIA',
-      'OPERADOR DE SERVICIO',
-      'CONDUCTOR DE PATRULLERO',
       'OPERADOR DE PATRULLERO',
+      'CONDUCTOR DE PATRULLERO',
       'PATRULLAJE A PIE',
       'INVESTIGADOR',
-      'ATENCIÓN AL PÚBLICO'
+      'ATENCIÓN AL PÚBLICO / DENUNCIAS',
+      'MESA DE PARTES',
+      'LOGÍSTICA / ARMERÍA',
+      'TELEMÁTICA / ESTADÍSTICA'
     ];
 
     const DEFAULT_HORARIOS = [
@@ -1525,53 +1772,32 @@
       '08:00 A 17:00',
       '07:00 A 15:00',
       '15:00 A 23:00',
-      '23:00 A 07:00',
-      'PERMANENTE'
+      '23:00 A 07:00'
     ];
 
     const DEFAULT_APTITUDES = [
       'A',
       'B',
       'C',
+      'DESCANSO MÉDICO',
       'VACACIONES',
       'PERMISO',
-      'DESCANSO MÉDICO',
       'COMISIÓN DE SERVICIO',
       'FRANCO'
     ];
 
-    const RANK_HIERARCHY = [
-      'GRAL. PNP',
-      'CRNL. PNP',
-      'CMDTE. PNP',
-      'MAY. PNP',
-      'CAP. PNP',
-      'TNTE. PNP',
-      'ALFZ. PNP',
-      'SS. PNP',
-      'SB. PNP',
-      'ST1. PNP',
-      'ST2. PNP',
-      'ST3. PNP',
-      'S1. PNP',
-      'S2. PNP',
-      'S3. PNP'
-    ];
-
-    const OFFICER_RANKS = ['GRAL. PNP', 'CRNL. PNP', 'CMDTE. PNP', 'MAY. PNP', 'CAP. PNP', 'TNTE. PNP', 'ALFZ. PNP'];
-
     const DEFAULT_SIGNATURES = {
       left: {
-        code: 'OA - 345678',
+        code: 'OA - 354128',
         rank: 'MAY. PNP',
         name: 'COMISARIO DE LA CPNP AYACUCHO',
         role: 'COMISARIO CPNP AYACUCHO'
       },
       right: {
-        code: 'CIP - 31245678',
-        rank: 'ST1. PNP',
-        name: 'ENCARGADO DE ADMINISTRACIÓN',
-        role: 'OFICINA DE ADMINISTRACIÓN'
+        code: 'CIP - 31458920',
+        rank: 'SB. PNP',
+        name: 'JEFE DE LA OFICINA DE ADMINISTRACIÓN',
+        role: 'JEFE DE ADMINISTRACIÓN CPNP AYACUCHO'
       }
     };
 
@@ -1687,6 +1913,21 @@
       return idx === -1 ? 999 : idx;
     }
 
+    function formatOfficerLicenseSummary(o) {
+      if (!o || o.tieneLicencia !== 'SI') return 'NO';
+      const vehs = Array.isArray(o.licenciaVehiculos) && o.licenciaVehiculos.length > 0
+        ? o.licenciaVehiculos.join(' / ')
+        : '';
+      const tipos = Array.isArray(o.licenciaTipos) && o.licenciaTipos.length > 0
+        ? o.licenciaTipos.join(' y ')
+        : '';
+      const nums = [];
+      if (o.licenciaNumeroCivil) nums.push(o.licenciaNumeroCivil);
+      if (o.licenciaNumeroPolicial) nums.push(`PNP: ${o.licenciaNumeroPolicial}`);
+      const numStr = nums.length > 0 ? `N° ${nums.join(' / ')}` : '';
+      return ['SÍ', vehs, tipos, numStr].filter(Boolean).join(' • ');
+    }
+
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       if (!container) return;
@@ -1705,6 +1946,37 @@
         toast.style.transform = 'translateY(8px)';
         setTimeout(() => toast.remove(), 300);
       }, 3200);
+    }
+
+    // =========================================================================
+    // MODAL HELPERS & DATE NAVIGATION
+    // =========================================================================
+    function openModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (!el) return;
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+
+    function handleDateChange(newDate) {
+      if (!newDate) return;
+      state.currentDate = newDate;
+      ensureDateRoleExists(newDate);
+      renderAll();
+    }
+
+    function goToToday() {
+      const today = getTodayISO();
+      handleDateChange(today);
+      showToast(`Fecha actual: ${formatSlashDate(today)}`, 'info');
     }
 
     // =========================================================================
@@ -1787,10 +2059,10 @@
       if (!btn || !txt) return;
 
       if (connected) {
-        btn.className = 'inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400 transition cursor-pointer';
+        btn.className = 'inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-950 bg-emerald-200 hover:bg-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-400 transition cursor-pointer';
         txt.textContent = labelText || 'Nube Conectada (Guardado Automático)';
       } else {
-        btn.className = 'inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 px-2.5 py-0.5 rounded-full border border-amber-400 transition cursor-pointer';
+        btn.className = 'inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-950 bg-amber-200 hover:bg-amber-300 px-2.5 py-0.5 rounded-full border border-amber-400 transition cursor-pointer';
         txt.textContent = labelText || 'Modo Local (Verificando Nube)';
       }
     }
@@ -1841,11 +2113,9 @@
 
         const docRef = db.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
 
-        // Initial check & real-time listener
         docRef.onSnapshot((docSnap) => {
           updateCloudStatusUI(true, 'Nube Conectada (Tiempo Real)');
           if (!docSnap.exists) {
-            // First time in cloud: upload local data if any exists
             pushStateToCloud(false);
             return;
           }
@@ -1863,10 +2133,10 @@
               if (remote.ranchoHistory) state.ranchoHistory = remote.ranchoHistory;
               if (remote.catalogs) {
                 state.catalogs = {
-                  sections: remote.catalogs.sections || [...DEFAULT_SECTIONS],
-                  cargos: remote.catalogs.cargos || [...DEFAULT_CARGOS],
-                  horarios: remote.catalogs.horarios || [...DEFAULT_HORARIOS],
-                  aptitudes: remote.catalogs.aptitudes || [...DEFAULT_APTITUDES]
+                  sections: Array.isArray(remote.catalogs.sections) && remote.catalogs.sections.length ? remote.catalogs.sections : [...DEFAULT_SECTIONS],
+                  cargos: Array.isArray(remote.catalogs.cargos) && remote.catalogs.cargos.length ? remote.catalogs.cargos : [...DEFAULT_CARGOS],
+                  horarios: Array.isArray(remote.catalogs.horarios) && remote.catalogs.horarios.length ? remote.catalogs.horarios : [...DEFAULT_HORARIOS],
+                  aptitudes: Array.isArray(remote.catalogs.aptitudes) && remote.catalogs.aptitudes.length ? remote.catalogs.aptitudes : [...DEFAULT_APTITUDES]
                 };
               }
               if (remote.signatures) state.signatures = remote.signatures;
@@ -1880,10 +2150,12 @@
             } finally {
               isApplyingRemoteSnapshot = false;
             }
+          } else if (localUpdatedAt > remoteUpdatedAt) {
+            pushStateToCloud(false);
           }
         }, (err) => {
-          console.error('Error en escucha en tiempo real de Firestore:', err);
-          updateCloudStatusUI(false, 'Revisar Permisos Firestore');
+          console.error('Error en suscripción Firestore:', err);
+          updateCloudStatusUI(false, 'Modo Local (Sin conexión nube)');
         });
       } catch (err) {
         console.error('Error inicializando Firebase:', err);
@@ -1892,155 +2164,139 @@
     }
 
     // =========================================================================
-    // MODAL & NAVIGATION HELPERS
+    // MAIN UI RENDERING (DATE HEADER & SECTIONS)
     // =========================================================================
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove('hidden');
-      el.classList.add('flex');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.add('hidden');
-      el.classList.remove('flex');
-    }
-
-    function openCloudStatusModal() {
-      openModal('cloud-status-modal');
-    }
-
-    // =========================================================================
-    // DATE CONTROL & MAIN RENDERING
-    // =========================================================================
-    function handleDateChange(newDate) {
-      if (!newDate) return;
-      state.currentDate = newDate;
-      ensureDateRoleExists(newDate);
-      saveState();
-      renderAll();
-    }
-
-    function goToToday() {
-      handleDateChange(getTodayISO());
+    function getOrderedSectionsForCurrentRole() {
+      const role = ensureDateRoleExists(state.currentDate);
+      const base = Array.isArray(state.catalogs.sections) ? [...state.catalogs.sections] : [...DEFAULT_SECTIONS];
+      role.officers.forEach(o => {
+        const sec = (o.section || 'PRINCIPAL').trim().toUpperCase();
+        if (sec && !base.includes(sec)) {
+          base.push(sec);
+        }
+      });
+      return base;
     }
 
     function renderDateHeader() {
-      const input = document.getElementById('service-date-input');
-      const display = document.getElementById('formatted-date-display');
+      const role = ensureDateRoleExists(state.currentDate);
+      const dateInput = document.getElementById('service-date-input');
+      const formattedDisplay = document.getElementById('formatted-date-display');
       const bottomDateLabel = document.getElementById('bottom-save-date-label');
       const bottomCountLabel = document.getElementById('bottom-save-count-label');
       const historyBadge = document.getElementById('history-count-badge');
 
-      if (input) input.value = state.currentDate;
-      if (display) display.textContent = formatSpanishDateLong(state.currentDate);
+      if (dateInput) dateInput.value = state.currentDate;
+      if (formattedDisplay) formattedDisplay.textContent = formatSpanishDateLong(state.currentDate);
       if (bottomDateLabel) bottomDateLabel.textContent = formatSlashDate(state.currentDate);
-
-      const role = ensureDateRoleExists(state.currentDate);
-      const count = role.officers.length;
       if (bottomCountLabel) {
+        const count = role.officers.length;
         bottomCountLabel.textContent = `${count} ${count === 1 ? 'efectivo registrado' : 'efectivos registrados'}`;
       }
-
-      const savedDatesCount = Object.keys(state.rolesByDate).filter(d => (state.rolesByDate[d]?.officers?.length || 0) > 0).length;
-      if (historyBadge) historyBadge.textContent = savedDatesCount;
-    }
-
-    function getOrderedSectionsForCurrentRole() {
-      const role = ensureDateRoleExists(state.currentDate);
-      const catalogSections = state.catalogs.sections || [];
-      const usedSections = [...new Set(role.officers.map(o => o.section))];
-      const allSections = [...catalogSections];
-      usedSections.forEach(sec => {
-        if (sec && !allSections.includes(sec)) allSections.push(sec);
-      });
-      return allSections;
+      if (historyBadge) {
+        const savedDatesCount = Object.keys(state.rolesByDate).filter(
+          d => (state.rolesByDate[d]?.officers?.length || 0) > 0
+        ).length;
+        historyBadge.textContent = savedDatesCount;
+      }
     }
 
     function renderSections() {
       const container = document.getElementById('sections-container');
       if (!container) return;
-
       const role = ensureDateRoleExists(state.currentDate);
       const sections = getOrderedSectionsForCurrentRole();
 
-      if (sections.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl border border-dashed border-gray-300 p-8 text-center space-y-3">
-            <p class="text-sm font-semibold text-gray-600">No hay secciones configuradas todavía.</p>
-            <button type="button" onclick="openOfficerModal()"
-              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0B5338] text-white text-xs font-bold cursor-pointer">
-              <i data-lucide="user-plus" class="w-4 h-4 text-[#D4AF37]"></i>
-              <span>Registrar Primer Efectivo</span>
-            </button>
-          </div>
-        `;
-        if (window.lucide) lucide.createIcons();
-        return;
-      }
-
-      container.innerHTML = sections.map(sectionName => {
+      container.innerHTML = sections.map((sectionName, secIdx) => {
         const sectionOfficers = role.officers.filter(o => o.section === sectionName);
         const safeSection = escapeHTML(sectionName);
         const encodedSection = encodeURIComponent(sectionName);
+        const isFirstSec = secIdx === 0;
+        const isLastSec = secIdx === sections.length - 1;
 
         const rowsHTML = sectionOfficers.length === 0
           ? `<tr><td colspan="9" class="py-4 px-4 text-center text-xs text-gray-400 italic">Sin efectivos asignados en esta sección</td></tr>`
-          : sectionOfficers.map((off, idx) => `
-              <tr class="hover:bg-emerald-50/40 transition border-b border-gray-100 last:border-b-0">
-                <td class="py-2.5 px-2.5 text-center text-xs font-bold text-gray-500">${idx + 1}</td>
-                <td class="py-2.5 px-2.5 text-xs font-bold text-[#063724] whitespace-nowrap">${escapeHTML(off.rank)}</td>
-                <td class="py-2.5 px-2.5 text-xs font-bold text-gray-900">${escapeHTML(off.name)}</td>
-                <td class="py-2.5 px-2.5 text-xs font-medium text-gray-700">${escapeHTML(off.cargo)}</td>
-                <td class="py-2.5 px-2.5 text-xs font-semibold text-[#0B5338] whitespace-nowrap">${escapeHTML(off.horario)}</td>
-                <td class="py-2.5 px-2.5 text-center">
-                  <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${off.aptitud === 'A' ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'}">
-                    ${escapeHTML(off.aptitud)}
-                  </span>
-                </td>
-                <td class="py-2.5 px-2.5 text-center text-xs font-mono font-semibold text-gray-700">${escapeHTML(off.cip)}</td>
-                <td class="py-2.5 px-2.5 text-center text-xs font-mono text-gray-600">${escapeHTML(off.phone || '-')}</td>
-                <td class="py-2.5 px-2.5 text-right whitespace-nowrap">
-                  <div class="inline-flex items-center gap-1">
-                    <button type="button" onclick="moveOfficer('${off.id}', -1)" ${idx === 0 ? 'disabled' : ''}
-                      class="p-1 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 cursor-pointer" title="Subir">
-                      <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button type="button" onclick="moveOfficer('${off.id}', 1)" ${idx === sectionOfficers.length - 1 ? 'disabled' : ''}
-                      class="p-1 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 cursor-pointer" title="Bajar">
-                      <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button type="button" onclick="openOfficerModal('${off.id}')"
-                      class="p-1.5 rounded-lg text-[#0B5338] hover:bg-emerald-100 cursor-pointer" title="Editar efectivo">
-                      <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button type="button" onclick="deleteOfficer('${off.id}')"
-                      class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 cursor-pointer" title="Eliminar efectivo">
-                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            `).join('');
+          : sectionOfficers.map((off, idx) => {
+              const hasLicBadge = off.tieneLicencia === 'SI'
+                ? `<span class="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded bg-sky-100 text-sky-900 text-[10px] font-bold" title="${escapeHTML(formatOfficerLicenseSummary(off))}">LIC</span>`
+                : '';
+              return `
+                <tr class="hover:bg-emerald-50/40 transition border-b border-gray-100 last:border-b-0">
+                  <td class="py-2.5 px-2.5 text-center text-xs font-bold text-gray-500">${idx + 1}</td>
+                  <td class="py-2.5 px-2.5 text-xs font-bold text-[#063724] whitespace-nowrap">${escapeHTML(off.rank)}</td>
+                  <td class="py-2.5 px-2.5 text-xs font-bold text-gray-900">
+                    ${escapeHTML(off.name)}${hasLicBadge}
+                  </td>
+                  <td class="py-2.5 px-2.5 text-xs font-medium text-gray-700">${escapeHTML(off.cargo)}</td>
+                  <td class="py-2.5 px-2.5 text-xs font-semibold text-[#0B5338] whitespace-nowrap">${escapeHTML(off.horario)}</td>
+                  <td class="py-2.5 px-2.5 text-center">
+                    <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${off.aptitud === 'A' ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'}">
+                      ${escapeHTML(off.aptitud)}
+                    </span>
+                  </td>
+                  <td class="py-2.5 px-2.5 text-center text-xs font-mono font-semibold text-gray-700">${escapeHTML(off.cip)}</td>
+                  <td class="py-2.5 px-2.5 text-center text-xs font-mono text-gray-600">${escapeHTML(off.phone || '-')}</td>
+                  <td class="py-2.5 px-2.5 text-right whitespace-nowrap">
+                    <div class="inline-flex items-center gap-1">
+                      <button type="button" onclick="moveOfficer('${off.id}', -1)" ${idx === 0 ? 'disabled' : ''}
+                        class="p-1 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 cursor-pointer" title="Subir efectivo">
+                        <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button type="button" onclick="moveOfficer('${off.id}', 1)" ${idx === sectionOfficers.length - 1 ? 'disabled' : ''}
+                        class="p-1 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 cursor-pointer" title="Bajar efectivo">
+                        <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button type="button" onclick="openOfficerModal('${off.id}')"
+                        class="p-1.5 rounded-lg text-[#0B5338] hover:bg-emerald-100 cursor-pointer" title="Editar efectivo">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                      </button>
+                      <button type="button" onclick="deleteOfficer('${off.id}')"
+                        class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 cursor-pointer" title="Eliminar efectivo">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('');
 
         return `
           <section class="bg-white rounded-2xl shadow-sm border border-emerald-900/15 overflow-hidden">
             <div class="bg-[#063724] text-white px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#D4AF37]">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
-                <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide">${safeSection}</h3>
-                <span class="px-2 py-0.5 rounded-full bg-white/15 text-[#D4AF37] text-[11px] font-bold">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
+                <h3 class="text-xs sm:text-sm font-extrabold uppercase tracking-wide truncate">${safeSection}</h3>
+                <span class="px-2 py-0.5 rounded-full bg-white/15 text-[#D4AF37] text-[11px] font-bold shrink-0">
                   ${sectionOfficers.length}
                 </span>
               </div>
-              <button type="button" onclick="openOfficerModalForSection(decodeURIComponent('${encodedSection}'))"
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#D4AF37] hover:bg-[#e5c147] text-[#063724] font-bold text-[11px] transition cursor-pointer">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>Agregar aquí</span>
-              </button>
+
+              <div class="flex flex-wrap items-center gap-1.5">
+                <div class="inline-flex items-center gap-0.5 bg-white/10 rounded-lg p-0.5 border border-white/15">
+                  <button type="button" onclick="moveSection(decodeURIComponent('${encodedSection}'), -1)" ${isFirstSec ? 'disabled' : ''}
+                    class="p-1 rounded text-white hover:bg-white/20 disabled:opacity-30 cursor-pointer" title="Subir sección">
+                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" onclick="moveSection(decodeURIComponent('${encodedSection}'), 1)" ${isLastSec ? 'disabled' : ''}
+                    class="p-1 rounded text-white hover:bg-white/20 disabled:opacity-30 cursor-pointer" title="Bajar sección">
+                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" onclick="openEditSectionModal(decodeURIComponent('${encodedSection}'))"
+                    class="p-1 rounded text-[#D4AF37] hover:bg-white/20 cursor-pointer" title="Editar nombre de sección">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button type="button" onclick="requestDeleteSection(decodeURIComponent('${encodedSection}'))"
+                    class="p-1 rounded text-red-300 hover:bg-red-500/30 hover:text-white cursor-pointer" title="Eliminar sección">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <button type="button" onclick="openOfficerModalForSection(decodeURIComponent('${encodedSection}'))"
+                  class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#D4AF37] hover:bg-[#e5c147] text-[#063724] font-bold text-[11px] transition cursor-pointer">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Agregar aquí</span>
+                </button>
+              </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -2068,6 +2324,96 @@
       }).join('');
 
       if (window.lucide) lucide.createIcons();
+    }
+
+    // =========================================================================
+    // SECTION MANAGEMENT ON MAIN SCREEN (MOVE, RENAME, DELETE)
+    // =========================================================================
+    function openCustomConfirmModal(title, message, onConfirmCallback) {
+      document.getElementById('custom-confirm-title').textContent = title;
+      document.getElementById('custom-confirm-message').textContent = message;
+      const btn = document.getElementById('custom-confirm-accept-btn');
+      btn.onclick = () => {
+        closeModal('custom-confirm-modal');
+        if (typeof onConfirmCallback === 'function') onConfirmCallback();
+      };
+      openModal('custom-confirm-modal');
+    }
+
+    function moveSection(sectionName, direction) {
+      const ordered = getOrderedSectionsForCurrentRole();
+      const idx = ordered.indexOf(sectionName);
+      const targetIdx = idx + direction;
+      if (idx === -1 || targetIdx < 0 || targetIdx >= ordered.length) return;
+
+      const temp = ordered[idx];
+      ordered[idx] = ordered[targetIdx];
+      ordered[targetIdx] = temp;
+
+      state.catalogs.sections = ordered;
+      saveState();
+      renderSections();
+    }
+
+    function openEditSectionModal(sectionName) {
+      document.getElementById('edit-section-old-name').value = sectionName;
+      const newInput = document.getElementById('edit-section-new-name');
+      newInput.value = sectionName;
+      openModal('edit-section-modal');
+      setTimeout(() => {
+        newInput.focus();
+        newInput.select();
+      }, 60);
+    }
+
+    function handleSaveSectionName(e) {
+      e.preventDefault();
+      const oldName = document.getElementById('edit-section-old-name').value;
+      const newName = document.getElementById('edit-section-new-name').value.trim().toUpperCase();
+
+      if (!newName) return;
+      if (oldName === newName) {
+        closeModal('edit-section-modal');
+        return;
+      }
+
+      const ordered = getOrderedSectionsForCurrentRole();
+      const updatedCatalog = [];
+      ordered.forEach(sec => {
+        const mapped = sec === oldName ? newName : sec;
+        if (!updatedCatalog.includes(mapped)) updatedCatalog.push(mapped);
+      });
+      state.catalogs.sections = updatedCatalog;
+
+      const role = ensureDateRoleExists(state.currentDate);
+      role.officers.forEach(o => {
+        if (o.section === oldName) o.section = newName;
+      });
+
+      saveState();
+      renderSections();
+      closeModal('edit-section-modal');
+      showToast(`Sección renombrada a "${newName}".`, 'success');
+    }
+
+    function requestDeleteSection(sectionName) {
+      const role = ensureDateRoleExists(state.currentDate);
+      const count = role.officers.filter(o => o.section === sectionName).length;
+      const detail = count > 0
+        ? ` Esta sección tiene ${count} ${count === 1 ? 'efectivo asignado' : 'efectivos asignados'} en la fecha actual que también serán retirados del rol.`
+        : '';
+
+      openCustomConfirmModal(
+        'Eliminar Sección',
+        `¿Está seguro de eliminar la sección "${sectionName}"?${detail}`,
+        () => {
+          state.catalogs.sections = (state.catalogs.sections || []).filter(s => s !== sectionName);
+          role.officers = role.officers.filter(o => o.section !== sectionName);
+          saveState();
+          renderAll();
+          showToast(`Sección "${sectionName}" eliminada.`, 'info');
+        }
+      );
     }
 
     function renderSignaturesInputs() {
@@ -2219,11 +2565,16 @@
     function deleteCatalogItem(type, value) {
       const cfg = COMBOBOX_MAP[type];
       if (!cfg) return;
-      if (!confirm(`¿Eliminar "${value}" de la lista desplegable?`)) return;
-      state.catalogs[cfg.catalogKey] = state.catalogs[cfg.catalogKey].filter(item => item !== value);
-      saveState();
-      openEditableCombobox(type, false);
-      showToast('Elemento eliminado del catálogo.', 'info');
+      openCustomConfirmModal(
+        'Eliminar del Catálogo',
+        `¿Está seguro de eliminar "${value}" de la lista desplegable?`,
+        () => {
+          state.catalogs[cfg.catalogKey] = state.catalogs[cfg.catalogKey].filter(item => item !== value);
+          saveState();
+          openEditableCombobox(type, false);
+          showToast('Elemento eliminado del catálogo.', 'info');
+        }
+      );
     }
 
     function addValueToCatalogIfMissing(catalogKey, value) {
@@ -2243,6 +2594,44 @@
         }
       });
     });
+
+    // =========================================================================
+    // DRIVER LICENSE CONDITIONAL UI HELPERS
+    // =========================================================================
+    function toggleLicenseDetailsFields() {
+      const hasLic = document.getElementById('officer-has-license-select')?.value === 'SI';
+      const box = document.getElementById('officer-license-details-box');
+      if (!box) return;
+      if (hasLic) {
+        box.classList.remove('hidden');
+        updateLicenseNumberInputsVisibility();
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function updateLicenseNumberInputsVisibility() {
+      const isCivil = document.getElementById('lic-tipo-civil')?.checked;
+      const isPolicial = document.getElementById('lic-tipo-policial')?.checked;
+      const civilWrap = document.getElementById('lic-num-civil-wrapper');
+      const policialWrap = document.getElementById('lic-num-policial-wrapper');
+      const civilLabel = document.getElementById('officer-lic-num-civil-label');
+
+      if (!civilWrap || !policialWrap || !civilLabel) return;
+
+      if (isCivil && isPolicial) {
+        civilWrap.classList.remove('hidden');
+        policialWrap.classList.remove('hidden');
+        civilLabel.textContent = 'N° de Licencia Civil *';
+      } else if (isPolicial && !isCivil) {
+        civilWrap.classList.add('hidden');
+        policialWrap.classList.remove('hidden');
+      } else {
+        civilWrap.classList.remove('hidden');
+        policialWrap.classList.add('hidden');
+        civilLabel.textContent = isCivil ? 'N° de Licencia Civil *' : 'N° de Licencia *';
+      }
+    }
 
     // =========================================================================
     // OFFICER CRUD (ADD, EDIT, DELETE, REORDER)
@@ -2266,6 +2655,19 @@
       const cipInput = document.getElementById('officer-cip-input');
       const phoneInput = document.getElementById('officer-phone-input');
 
+      // Personal & Driver License fields
+      const sexoSelect = document.getElementById('officer-sexo-select');
+      const birthDateInput = document.getElementById('officer-birth-date-input');
+      const entryDateInput = document.getElementById('officer-entry-date-input');
+      const addressInput = document.getElementById('officer-address-input');
+      const hasLicenseSelect = document.getElementById('officer-has-license-select');
+      const vehMayorCb = document.getElementById('lic-veh-mayor');
+      const vehMenorCb = document.getElementById('lic-veh-menor');
+      const tipoCivilCb = document.getElementById('lic-tipo-civil');
+      const tipoPolicialCb = document.getElementById('lic-tipo-policial');
+      const licNumCivilInput = document.getElementById('officer-lic-num-civil');
+      const licNumPolicialInput = document.getElementById('officer-lic-num-policial');
+
       if (officerId) {
         const role = ensureDateRoleExists(state.currentDate);
         const off = role.officers.find(o => o.id === officerId);
@@ -2282,6 +2684,21 @@
         aptitudInput.value = off.aptitud || 'A';
         cipInput.value = off.cip || '';
         phoneInput.value = off.phone || '';
+
+        sexoSelect.value = off.sexo || 'MASCULINO';
+        birthDateInput.value = off.fechaNacimiento || '';
+        entryDateInput.value = off.fechaIngreso || '';
+        addressInput.value = off.direccion || '';
+        hasLicenseSelect.value = off.tieneLicencia || 'NO';
+
+        const vehs = Array.isArray(off.licenciaVehiculos) ? off.licenciaVehiculos : [];
+        const tipos = Array.isArray(off.licenciaTipos) ? off.licenciaTipos : [];
+        vehMayorCb.checked = vehs.includes('VEHÍCULO MAYOR');
+        vehMenorCb.checked = vehs.includes('VEHÍCULO MENOR');
+        tipoCivilCb.checked = tipos.includes('CIVIL');
+        tipoPolicialCb.checked = tipos.includes('POLICIAL');
+        licNumCivilInput.value = off.licenciaNumeroCivil || '';
+        licNumPolicialInput.value = off.licenciaNumeroPolicial || '';
       } else {
         titleEl.textContent = 'Registrar Efectivo Policial';
         idInput.value = '';
@@ -2294,8 +2711,21 @@
         aptitudInput.value = 'A';
         cipInput.value = '';
         phoneInput.value = '';
+
+        sexoSelect.value = 'MASCULINO';
+        birthDateInput.value = '';
+        entryDateInput.value = '';
+        addressInput.value = '';
+        hasLicenseSelect.value = 'NO';
+        vehMayorCb.checked = false;
+        vehMenorCb.checked = false;
+        tipoCivilCb.checked = false;
+        tipoPolicialCb.checked = false;
+        licNumCivilInput.value = '';
+        licNumPolicialInput.value = '';
       }
 
+      toggleLicenseDetailsFields();
       openModal('officer-modal');
       setTimeout(() => nameInput.focus(), 80);
     }
@@ -2318,6 +2748,50 @@
       const cip = document.getElementById('officer-cip-input').value.trim();
       const phone = document.getElementById('officer-phone-input').value.trim();
 
+      // Personal & Driver License fields
+      const sexo = document.getElementById('officer-sexo-select').value;
+      const fechaNacimiento = document.getElementById('officer-birth-date-input').value;
+      const fechaIngreso = document.getElementById('officer-entry-date-input').value;
+      const direccion = document.getElementById('officer-address-input').value.trim().toUpperCase();
+      const tieneLicencia = document.getElementById('officer-has-license-select').value;
+
+      let licenciaVehiculos = [];
+      let licenciaTipos = [];
+      let licenciaNumeroCivil = '';
+      let licenciaNumeroPolicial = '';
+
+      if (tieneLicencia === 'SI') {
+        if (document.getElementById('lic-veh-mayor').checked) licenciaVehiculos.push('VEHÍCULO MAYOR');
+        if (document.getElementById('lic-veh-menor').checked) licenciaVehiculos.push('VEHÍCULO MENOR');
+
+        if (document.getElementById('lic-tipo-civil').checked) licenciaTipos.push('CIVIL');
+        if (document.getElementById('lic-tipo-policial').checked) licenciaTipos.push('POLICIAL');
+
+        if (licenciaVehiculos.length === 0) {
+          showToast('Seleccione si la licencia es para Vehículo Mayor y/o Vehículo Menor.', 'warning');
+          return;
+        }
+        if (licenciaTipos.length === 0) {
+          showToast('Seleccione si la licencia es de tipo Civil y/o Policial.', 'warning');
+          return;
+        }
+
+        if (licenciaTipos.includes('CIVIL')) {
+          licenciaNumeroCivil = document.getElementById('officer-lic-num-civil').value.trim().toUpperCase();
+          if (!licenciaNumeroCivil) {
+            showToast('Ingrese el número de la licencia de conducir civil.', 'warning');
+            return;
+          }
+        }
+        if (licenciaTipos.includes('POLICIAL')) {
+          licenciaNumeroPolicial = document.getElementById('officer-lic-num-policial').value.trim().toUpperCase();
+          if (!licenciaNumeroPolicial) {
+            showToast('Ingrese el número de la licencia de conducir policial.', 'warning');
+            return;
+          }
+        }
+      }
+
       if (!section || !name || !cargo || !horario || !aptitud || !cip) {
         showToast('Complete todos los campos obligatorios.', 'warning');
         return;
@@ -2329,36 +2803,40 @@
       addValueToCatalogIfMissing('aptitudes', aptitud);
 
       const role = ensureDateRoleExists(state.currentDate);
+      const officerPayload = {
+        section,
+        category,
+        rank,
+        name,
+        cargo,
+        horario,
+        aptitud,
+        cip,
+        phone,
+        sexo,
+        fechaNacimiento,
+        fechaIngreso,
+        direccion,
+        tieneLicencia,
+        licenciaVehiculos,
+        licenciaTipos,
+        licenciaNumeroCivil,
+        licenciaNumeroPolicial
+      };
 
       if (id) {
         const idx = role.officers.findIndex(o => o.id === id);
         if (idx !== -1) {
           role.officers[idx] = {
             ...role.officers[idx],
-            section,
-            category,
-            rank,
-            name,
-            cargo,
-            horario,
-            aptitud,
-            cip,
-            phone
+            ...officerPayload
           };
           showToast('Efectivo actualizado y grabado.', 'success');
         }
       } else {
         role.officers.push({
           id: generateId(),
-          section,
-          category,
-          rank,
-          name,
-          cargo,
-          horario,
-          aptitud,
-          cip,
-          phone
+          ...officerPayload
         });
         showToast('Efectivo registrado y grabado.', 'success');
       }
@@ -2369,12 +2847,17 @@
     }
 
     function deleteOfficer(id) {
-      if (!confirm('¿Está seguro de eliminar a este efectivo del rol de servicio?')) return;
-      const role = ensureDateRoleExists(state.currentDate);
-      role.officers = role.officers.filter(o => o.id !== id);
-      saveState();
-      renderAll();
-      showToast('Efectivo eliminado del rol.', 'info');
+      openCustomConfirmModal(
+        'Eliminar Efectivo',
+        '¿Está seguro de eliminar a este efectivo del rol de servicio?',
+        () => {
+          const role = ensureDateRoleExists(state.currentDate);
+          role.officers = role.officers.filter(o => o.id !== id);
+          saveState();
+          renderAll();
+          showToast('Efectivo eliminado del rol.', 'info');
+        }
+      );
     }
 
     function moveOfficer(id, direction) {
@@ -2528,7 +3011,7 @@
             const isPrincipal = sectionName.trim().toUpperCase() === 'PRINCIPAL';
             const bannerHTML = isPrincipal
               ? ''
-              : `<div class="official-section-banner print-section-header">${escapeHTML(sectionName)}</div>`;
+              : `<div class="official-section-banner print-section-header" style="background-color:#ffffff; color:#000000; border:0.25pt solid #1f2937; border-bottom:none; font-size:15pt; font-weight:800; padding:4px 6px; line-height:1.2; text-align:center; text-transform:uppercase;">${escapeHTML(sectionName)}</div>`;
 
             const rowsHTML = officers.map(off => {
               globalCounter += 1;
@@ -2699,13 +3182,18 @@
     }
 
     function deleteDateFromHistory(isoDate) {
-      if (!confirm(`¿Eliminar definitivamente el rol guardado del ${formatSlashDate(isoDate)}?`)) return;
-      delete state.rolesByDate[isoDate];
-      ensureDateRoleExists(state.currentDate);
-      saveState();
-      renderAll();
-      openHistoryModal();
-      showToast('Rol eliminado del historial.', 'info');
+      openCustomConfirmModal(
+        'Eliminar Rol Guardado',
+        `¿Está seguro de eliminar definitivamente el rol guardado del ${formatSlashDate(isoDate)}?`,
+        () => {
+          delete state.rolesByDate[isoDate];
+          ensureDateRoleExists(state.currentDate);
+          saveState();
+          renderAll();
+          openHistoryModal();
+          showToast('Rol eliminado del historial.', 'info');
+        }
+      );
     }
 
     function openCopyRoleModal() {
@@ -2788,7 +3276,6 @@
       const ranks = unique(officers.map(o => o.rank)).sort((a, b) => getRankOrderIndex(a) - getRankOrderIndex(b));
       const cargos = unique(officers.map(o => o.cargo)).sort();
       const horarios = unique(officers.map(o => o.horario)).sort();
-      const aptitudes = unique(officers.map(o => o.aptitud)).sort();
 
       document.getElementById('report-filter-section').innerHTML =
         `<option value="ALL">TODAS LAS SECCIONES</option>` +
@@ -2805,10 +3292,6 @@
       document.getElementById('report-filter-horario').innerHTML =
         `<option value="ALL">TODOS LOS HORARIOS</option>` +
         horarios.map(h => `<option value="${escapeHTML(h)}">${escapeHTML(h)}</option>`).join('');
-
-      document.getElementById('report-filter-aptitud').innerHTML =
-        `<option value="ALL">TODAS LAS APTITUDES</option>` +
-        aptitudes.map(a => `<option value="${escapeHTML(a)}">${escapeHTML(a)}</option>`).join('');
     }
 
     function getFilteredReportOfficers() {
@@ -2818,7 +3301,7 @@
       const rankVal = document.getElementById('report-filter-rank').value;
       const cargoVal = document.getElementById('report-filter-cargo').value;
       const horarioVal = document.getElementById('report-filter-horario').value;
-      const aptitudVal = document.getElementById('report-filter-aptitud').value;
+      const licenseVal = document.getElementById('report-filter-license').value;
       const searchVal = (document.getElementById('report-filter-search').value || '').trim().toUpperCase();
 
       const role = state.rolesByDate[isoDate] || { officers: [] };
@@ -2829,15 +3312,24 @@
         if (rankVal !== 'ALL' && o.rank !== rankVal) return false;
         if (cargoVal !== 'ALL' && o.cargo !== cargoVal) return false;
         if (horarioVal !== 'ALL' && o.horario !== horarioVal) return false;
-        if (aptitudVal !== 'ALL' && o.aptitud !== aptitudVal) return false;
+
+        if (licenseVal !== 'ALL') {
+          const hasLic = o.tieneLicencia === 'SI';
+          if (licenseVal === 'SI' && !hasLic) return false;
+          if (licenseVal === 'NO' && hasLic) return false;
+          if (licenseVal === 'VEHÍCULO MAYOR' && (!hasLic || !(o.licenciaVehiculos || []).includes('VEHÍCULO MAYOR'))) return false;
+          if (licenseVal === 'VEHÍCULO MENOR' && (!hasLic || !(o.licenciaVehiculos || []).includes('VEHÍCULO MENOR'))) return false;
+          if (licenseVal === 'CIVIL' && (!hasLic || !(o.licenciaTipos || []).includes('CIVIL'))) return false;
+          if (licenseVal === 'POLICIAL' && (!hasLic || !(o.licenciaTipos || []).includes('POLICIAL'))) return false;
+        }
+
         if (searchVal) {
-          const hay = `${o.name} ${o.cip} ${o.phone || ''} ${o.rank} ${o.section}`.toUpperCase();
+          const hay = `${o.name} ${o.cip} ${o.phone || ''} ${o.rank} ${o.section} ${o.direccion || ''} ${o.licenciaNumeroCivil || ''} ${o.licenciaNumeroPolicial || ''}`.toUpperCase();
           if (!hay.includes(searchVal)) return false;
         }
         return true;
       });
 
-      // Sort by PNP hierarchy, then alphabetically
       return filtered.sort((a, b) => {
         const rankDiff = getRankOrderIndex(a.rank) - getRankOrderIndex(b.rank);
         if (rankDiff !== 0) return rankDiff;
@@ -2851,7 +3343,7 @@
       document.getElementById('report-filter-rank').value = 'ALL';
       document.getElementById('report-filter-cargo').value = 'ALL';
       document.getElementById('report-filter-horario').value = 'ALL';
-      document.getElementById('report-filter-aptitud').value = 'ALL';
+      document.getElementById('report-filter-license').value = 'ALL';
       document.getElementById('report-filter-search').value = '';
       renderReportsTable();
     }
@@ -2863,11 +3355,13 @@
 
       const oficialesCount = list.filter(o => (o.category || (OFFICER_RANKS.includes(o.rank) ? 'OFICIAL' : 'SUB OFICIAL')) === 'OFICIAL').length;
       const subOficialesCount = list.length - oficialesCount;
+      const conLicenciaCount = list.filter(o => o.tieneLicencia === 'SI').length;
 
       summaryEl.innerHTML = `
         <span class="px-2.5 py-1 rounded-lg bg-[#063724] text-[#D4AF37] font-bold">Total: ${list.length}</span>
         <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 font-bold">Oficiales: ${oficialesCount}</span>
         <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-900 font-bold">Suboficiales: ${subOficialesCount}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-bold">Con Licencia: ${conLicenciaCount}</span>
       `;
 
       if (list.length === 0) {
@@ -2884,11 +3378,10 @@
                 <th class="py-2 px-2.5">Grado</th>
                 <th class="py-2 px-2.5">Apellidos y Nombres</th>
                 <th class="py-2 px-2.5">Sección</th>
-                <th class="py-2 px-2.5">Cargo</th>
-                <th class="py-2 px-2.5">Horario</th>
-                <th class="py-2 px-2.5 text-center">Aptitud</th>
-                <th class="py-2 px-2.5 text-center">CIP</th>
-                <th class="py-2 px-2.5 text-center">Celular</th>
+                <th class="py-2 px-2.5">Cargo / Horario</th>
+                <th class="py-2 px-2.5 text-center">CIP / Celular</th>
+                <th class="py-2 px-2.5">Licencia de Conducir</th>
+                <th class="py-2 px-2.5">Dirección</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -2896,13 +3389,27 @@
                 <tr class="hover:bg-emerald-50/40">
                   <td class="py-2 px-2.5 text-center font-bold text-gray-500">${i + 1}</td>
                   <td class="py-2 px-2.5 font-bold text-[#063724] whitespace-nowrap">${escapeHTML(o.rank)}</td>
-                  <td class="py-2 px-2.5 font-bold text-gray-900">${escapeHTML(o.name)}</td>
+                  <td class="py-2 px-2.5 font-bold text-gray-900">
+                    <div>${escapeHTML(o.name)}</div>
+                    <div class="text-[10px] font-normal text-gray-500">
+                      ${escapeHTML(o.sexo || '')}${o.fechaIngreso ? ` • Ingreso: ${formatSlashDate(o.fechaIngreso)}` : ''}
+                    </div>
+                  </td>
                   <td class="py-2 px-2.5 text-gray-700">${escapeHTML(o.section)}</td>
-                  <td class="py-2 px-2.5 text-gray-700">${escapeHTML(o.cargo)}</td>
-                  <td class="py-2 px-2.5 text-[#0B5338] font-semibold whitespace-nowrap">${escapeHTML(o.horario)}</td>
-                  <td class="py-2 px-2.5 text-center font-bold">${escapeHTML(o.aptitud)}</td>
-                  <td class="py-2 px-2.5 text-center font-mono">${escapeHTML(o.cip)}</td>
-                  <td class="py-2 px-2.5 text-center font-mono">${escapeHTML(o.phone || '-')}</td>
+                  <td class="py-2 px-2.5 text-gray-700">
+                    <div>${escapeHTML(o.cargo)}</div>
+                    <div class="text-[10px] text-[#0B5338] font-semibold">${escapeHTML(o.horario)}</div>
+                  </td>
+                  <td class="py-2 px-2.5 text-center font-mono">
+                    <div class="font-bold">${escapeHTML(o.cip)}</div>
+                    <div class="text-[10px] text-gray-500">${escapeHTML(o.phone || '-')}</div>
+                  </td>
+                  <td class="py-2 px-2.5">
+                    ${o.tieneLicencia === 'SI'
+                      ? `<span class="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-900 border border-sky-200 text-[11px] font-bold">${escapeHTML(formatOfficerLicenseSummary(o))}</span>`
+                      : `<span class="text-gray-400 text-[11px]">NO</span>`}
+                  </td>
+                  <td class="py-2 px-2.5 text-gray-600 text-[11px]">${escapeHTML(o.direccion || '-')}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -2924,9 +3431,8 @@
           <td>${escapeHTML(o.section)}</td>
           <td>${escapeHTML(o.cargo)}</td>
           <td style="text-align:center;">${escapeHTML(o.horario)}</td>
-          <td style="text-align:center; font-weight:700;">${escapeHTML(o.aptitud)}</td>
           <td style="text-align:center; font-family:monospace;">${escapeHTML(o.cip)}</td>
-          <td style="text-align:center; font-family:monospace;">${escapeHTML(o.phone || '')}</td>
+          <td>${escapeHTML(formatOfficerLicenseSummary(o))}</td>
         </tr>
       `).join('');
 
@@ -2952,13 +3458,12 @@
                 <th>SECCIÓN</th>
                 <th>CARGO</th>
                 <th style="text-align:center;">HORARIO</th>
-                <th style="text-align:center;">APTITUD</th>
                 <th style="text-align:center;">CIP</th>
-                <th style="text-align:center;">CELULAR</th>
+                <th>LICENCIA DE CONDUCIR</th>
               </tr>
             </thead>
             <tbody>
-              ${rowsHTML || '<tr><td colspan="9" style="text-align:center; padding:10px;">Sin registros</td></tr>'}
+              ${rowsHTML || '<tr><td colspan="8" style="text-align:center; padding:10px;">Sin registros</td></tr>'}
             </tbody>
           </table>
 
@@ -3010,7 +3515,6 @@
           statusLabel.textContent = `Lista de rancho guardada cargada (${ranchoUI.selectedOfficerIds.size} efectivos).`;
         }
       } else if (role && Array.isArray(role.officers)) {
-        // Default: auto-select officers with aptitud 'A'
         role.officers.forEach(o => {
           if ((o.aptitud || 'A').toUpperCase() === 'A') {
             ranchoUI.selectedOfficerIds.add(o.id);
@@ -3248,6 +3752,9 @@
         const cm = `${Number(val)}cm`;
         return `width:${cm}; min-width:${cm}; max-width:${cm}; ${extraStyle}`;
       }
+      if (colKey === 'nombres') {
+        return `width:auto; white-space:normal; word-break:break-word; ${extraStyle}`;
+      }
       return `width:auto; white-space:nowrap; ${extraStyle}`;
     }
 
@@ -3267,52 +3774,48 @@
 
       const bodyRowsHTML = rows.map((r, idx) => `
         <tr style="height:${rowCm} !important;">
-          <td style="border:0.25pt solid #1f2937; padding:2px 4px; font-size:5pt; text-align:center; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('nro')}">${idx + 1}</td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 4px; font-size:5pt; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('grado')}">${escapeHTML(r.rank)}</td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 5px; font-size:5pt; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('nombres')}">${escapeHTML(r.name)}</td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 4px; font-size:5pt; text-align:center; font-family:monospace; height:${rowCm} !important; ${getRanchoColStyle('cip')}">${escapeHTML(r.cip)}</td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 5px; font-size:5pt; text-align:center; font-weight:800; height:${rowCm} !important; ${getRanchoColStyle('ticket')}">${escapeHTML(r.ticketNumber)}</td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 4px; font-size:5pt; height:${rowCm} !important; ${getRanchoColStyle('firma')}"></td>
-          <td style="border:0.25pt solid #1f2937; padding:2px 4px; font-size:5pt; height:${rowCm} !important; ${getRanchoColStyle('id')}"></td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:12pt !important; text-align:center; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('nro')}">${idx + 1}</td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 5px; font-size:12pt !important; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('grado')}">${escapeHTML(r.rank)}</td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 6px; font-size:12pt !important; font-weight:700; height:${rowCm} !important; ${getRanchoColStyle('nombres')}">${escapeHTML(r.name)}</td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 5px; font-size:12pt !important; text-align:center; font-family:monospace; height:${rowCm} !important; ${getRanchoColStyle('cip')}">${escapeHTML(r.cip)}</td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 5px; font-size:12pt !important; text-align:center; font-weight:800; height:${rowCm} !important; ${getRanchoColStyle('ticket')}">${escapeHTML(r.ticketNumber)}</td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:12pt !important; height:${rowCm} !important; ${getRanchoColStyle('firma')}"></td>
+          <td style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:12pt !important; height:${rowCm} !important; ${getRanchoColStyle('id')}"></td>
         </tr>
       `).join('');
 
       return `
-        <div style="font-family:'Inter', Arial, sans-serif; color:#000;">
+        <div style="font-family:'Inter', Arial, sans-serif; color:#000; width:100%;">
           <div style="text-align:center; margin-bottom:10px; border-bottom:1pt solid #063724; padding-bottom:5px;">
-            <div style="font-weight:800; font-size:9pt; color:#063724;">POLICÍA NACIONAL DEL PERÚ</div>
-            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:7.5pt; margin-top:2px;">
+            <div style="font-weight:800; font-size:11pt; color:#063724;">POLICÍA NACIONAL DEL PERÚ</div>
+            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:9pt; margin-top:2px;">
               <span>DIVOPUS TRUJILLO</span>
               <span>COMISARÍA PNP AYACUCHO</span>
             </div>
-            <div style="font-weight:800; font-size:8.5pt; margin-top:6px; text-decoration:underline;">
+            <div style="font-weight:800; font-size:10pt; margin-top:6px; text-decoration:underline;">
               RELACIÓN DE PERSONAL PNP QUE RECIBE TICKET DE RANCHO
             </div>
-            <div style="font-weight:700; font-size:7pt; margin-top:2px;">
+            <div style="font-weight:700; font-size:8.5pt; margin-top:2px;">
               CORRESPONDIENTE AL DÍA ${escapeHTML(formatSpanishDateOfficial(ranchoUI.date))}
             </div>
           </div>
 
-          <table class="rancho-table">
+          <table class="rancho-table" style="width:100%; max-width:100%; border-collapse:collapse;">
             <thead>
               <tr style="background-color:#063724; color:#fff;">
-                <th style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:5pt; text-align:center; ${getRanchoColStyle('nro')}">NRO.</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:5pt; text-align:left; ${getRanchoColStyle('grado')}">GRADO</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 5px; font-size:5pt; text-align:left; ${getRanchoColStyle('nombres')}">APELLIDOS Y NOMBRES</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:5pt; text-align:center; ${getRanchoColStyle('cip')}">CIP</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 5px; font-size:5pt; text-align:center; ${getRanchoColStyle('ticket')}">TICKET</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:5pt; text-align:center; ${getRanchoColStyle('firma')}">FIRMA</th>
-                <th style="border:0.25pt solid #1f2937; padding:3px 4px; font-size:5pt; text-align:center; ${getRanchoColStyle('id')}">ID</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 4px; font-size:9pt; text-align:center; ${getRanchoColStyle('nro')}">NRO.</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 5px; font-size:9pt; text-align:left; ${getRanchoColStyle('grado')}">GRADO</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 6px; font-size:9pt; text-align:left; ${getRanchoColStyle('nombres')}">APELLIDOS Y NOMBRES</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 5px; font-size:9pt; text-align:center; ${getRanchoColStyle('cip')}">CIP</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 5px; font-size:9pt; text-align:center; ${getRanchoColStyle('ticket')}">TICKET</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 4px; font-size:9pt; text-align:center; ${getRanchoColStyle('firma')}">FIRMA</th>
+                <th style="border:0.25pt solid #1f2937; padding:4px 4px; font-size:9pt; text-align:center; ${getRanchoColStyle('id')}">ID</th>
               </tr>
             </thead>
             <tbody>
               ${bodyRowsHTML}
             </tbody>
           </table>
-
-          <div style="margin-top:8px; font-size:6.5pt; font-weight:800; text-align:right; color:#063724;">
-            TOTAL RACIONES / TICKETS ENTREGADOS: ${rows.length}
-          </div>
         </div>
       `;
     }
@@ -3422,17 +3925,26 @@
     }
 
     function deleteRanchoFromHistory(isoDate) {
-      if (!confirm(`¿Eliminar la lista de rancho guardada del ${formatSlashDate(isoDate)}?`)) return;
-      delete state.ranchoHistory[isoDate];
-      saveState();
-      updateRanchoHistoryBadge();
-      openRanchoHistoryModal();
-      showToast('Lista de rancho eliminada.', 'info');
+      openCustomConfirmModal(
+        'Eliminar Lista de Rancho',
+        `¿Está seguro de eliminar la lista de rancho guardada del ${formatSlashDate(isoDate)}?`,
+        () => {
+          delete state.ranchoHistory[isoDate];
+          saveState();
+          updateRanchoHistoryBadge();
+          openRanchoHistoryModal();
+          showToast('Lista de rancho eliminada.', 'info');
+        }
+      );
     }
 
     // =========================================================================
-    // JSON BACKUP EXPORT / IMPORT
+    // CLOUD STATUS MODAL & JSON BACKUP EXPORT / IMPORT
     // =========================================================================
+    function openCloudStatusModal() {
+      openModal('cloud-status-modal');
+    }
+
     function exportBackupJSON() {
       const dataStr = JSON.stringify(state, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
